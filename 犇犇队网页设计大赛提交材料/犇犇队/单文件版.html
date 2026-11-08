@@ -1,0 +1,3269 @@
+<!doctype html>
+<html lang="zh-CN" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>豆苗实验室 · 三个小实验，看懂一台计算机</title>
+<meta name="description" content="面向 6–12 岁孩子的少儿 AI 与计算机科普互动网站。三个能上手的小实验：开关就是数字、AI 怎么认猫、这封信能信吗。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23FBF6E9'/%3E%3Cpath d='M20 28V17' stroke='%234C8B3F' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M20 19c-5 0-9-4-9-9 5 0 9 4 9 9z' fill='%238FB86E'/%3E%3Cpath d='M20 19c5 0 9-4 9-9-5 0-9 4-9 9z' fill='%238FB86E'/%3E%3Cpath d='M11 28h18l-2 7H13z' fill='%23E0C9A6' stroke='%239C7B52' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+@charset "UTF-8";
+
+@layer tokens, base, layout, components, pages, motion;
+
+/* ============ tokens ============ */
+@layer tokens {
+  :root {
+    /* 纸与格 */
+    --paper:      #FBF6E9;
+    --paper-2:    #FFFDF6;
+    --grid:       rgba(90, 130, 170, .13);
+    --grid-2:     rgba(90, 130, 170, .07);
+
+    /* 墨 */
+    --ink:        #2A2A28;
+    --ink-2:      #55534C;
+    --ink-3:      #6B6861;
+
+    /* 记号笔 */
+    --red:        #D94F3D;
+    --red-ink:    #B23A28;
+    --blue:       #2F6FB2;
+    --yellow:     #F2B705;
+    --green:      #4C8B3F;
+    --green-ink:  #3F7A34;
+
+    --line:       rgba(42, 42, 40, .22);
+    --line-soft:  rgba(42, 42, 40, .12);
+
+    /* 字体 */
+    --f-hand: "KaiTi", "STKaiti", "楷体", "Kaiti SC", "FangSong", serif;
+    --f-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+    --f-num:  "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+
+    /* 字号 */
+    --t-cap:  0.9rem;
+    --t-sm:   1rem;
+    --t-base: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+    --t-lg:   clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+    --t-xl:   clamp(1.6rem, 1.3rem + 1.2vw, 2.15rem);
+    --t-2xl:  clamp(2.2rem, 1.6rem + 2.6vw, 3.3rem);
+    --t-3xl:  clamp(2.9rem, 1.8rem + 4.6vw, 4.8rem);
+
+    /* 间距 */
+    --s-1: .25rem; --s-2: .5rem;  --s-3: .75rem; --s-4: 1rem;
+    --s-5: 1.5rem; --s-6: 2rem;   --s-7: 3rem;   --s-8: 4rem;
+
+    /* 手绘圆角：刻意不对称 */
+    --r-hand: 18px 12px 20px 10px / 12px 20px 10px 18px;
+    --r-hand-sm: 10px 7px 12px 6px / 7px 12px 6px 10px;
+    --r-tape: 2px;
+
+    /* 纸片投影 */
+    --sh-paper: 0 1px 0 rgba(42,42,40,.06), 0 6px 16px -8px rgba(42,42,40,.24);
+    --sh-lift:  0 2px 0 rgba(42,42,40,.07), 0 12px 28px -14px rgba(42,42,40,.34);
+
+    --e-out: cubic-bezier(.16, 1, .3, 1);
+    --e-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --d-1: 120ms; --d-2: 180ms; --d-3: 260ms; --d-4: 380ms;
+  }
+}
+
+/* ============ base ============ */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--f-body);
+    font-size: var(--t-base);
+    line-height: 1.7;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(var(--grid-2) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-2) 1px, transparent 1px);
+    background-size: 26px 26px, 26px 26px, 130px 130px, 130px 130px;
+    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  }
+
+  h1, h2, h3, p, ul, figure { margin: 0; }
+  ul { list-style: none; padding: 0; }
+
+  h1, h2 {
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  b { font-weight: 700; }
+
+  :focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--s-4);
+  }
+  .skip:focus {
+    left: var(--s-4);
+    top: var(--s-4);
+    z-index: 99;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--s-2) var(--s-5);
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand-sm);
+  }
+}
+
+/* ============ layout ============ */
+@layer layout {
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding: var(--s-3) clamp(var(--s-4), 4vw, var(--s-7));
+    background: rgba(251, 246, 233, .93);
+    backdrop-filter: blur(6px);
+    border-bottom: 1.5px solid var(--line-soft);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    gap: var(--s-2);
+    text-decoration: none;
+    color: var(--ink);
+    font-family: var(--f-hand);
+    font-size: clamp(1rem, .88rem + .7vw, 1.25rem);
+    font-weight: 700;
+    white-space: nowrap;
+    flex: none;
+  }
+  .brand__mark { display: flex; }
+  .brand:hover .brand__txt { color: var(--red-ink); }
+
+  .tabs { display: flex; gap: var(--s-1); flex-wrap: nowrap; justify-content: flex-end; min-width: 0; }
+
+  .tab {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--s-2) var(--s-3);
+    border: 1.5px solid transparent;
+    border-radius: var(--r-hand-sm);
+    background: none;
+    color: var(--ink-2);
+    font: inherit;
+    font-size: var(--t-sm);
+    cursor: pointer;
+    transition: background-color var(--d-1), color var(--d-1), border-color var(--d-1);
+  }
+  .tab__n { font-family: var(--f-num); font-size: .85em; color: var(--ink-3); }
+  .tab:hover { background: rgba(47, 111, 178, .08); color: var(--ink); }
+  .tab[aria-current="true"] {
+    border-color: var(--line);
+    background: var(--paper-2);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .tab[aria-current="true"] .tab__n { color: var(--red-ink); }
+
+  main {
+    width: min(100% - clamp(var(--s-4), 6vw, var(--s-8)), 1120px);
+    margin-inline: auto;
+    padding-block: clamp(var(--s-5), 5vw, var(--s-8));
+  }
+
+  .foot {
+    padding: var(--s-6) var(--s-4) var(--s-8);
+    text-align: center;
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+    line-height: 1.8;
+  }
+}
+
+/* ============ components ============ */
+@layer components {
+
+  .page { display: none; scroll-margin-top: 84px; }
+  .no-js .page { display: block; margin-bottom: var(--s-7); }
+  .no-js .tabs { display: none; }
+  .page.is-on { display: block; }
+  .page--cover.is-on {
+    display: grid;
+    /* 内容高于容器时不能用裸 center，会把顶部（kicker）顶到导航下面 */
+    align-content: safe center;
+    min-height: min(74vh, 660px);
+  }
+
+  /* ---- 手账纸 ---- */
+  .sheet {
+    position: relative;
+    padding: clamp(var(--s-5), 4vw, var(--s-7));
+    background: var(--paper-2);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-hand);
+    box-shadow: var(--sh-paper);
+  }
+
+  .kicker {
+    font-family: var(--f-hand);
+    font-size: 1.05rem;
+    color: var(--red-ink);
+    letter-spacing: .04em;
+    margin-bottom: var(--s-2);
+  }
+
+  h2 { font-size: var(--t-2xl); margin-bottom: var(--s-3); }
+
+  .sub {
+    max-width: 46ch;
+    color: var(--ink-2);
+    font-size: var(--t-lg);
+    line-height: 1.6;
+    margin-bottom: var(--s-6);
+  }
+  .sub b { color: var(--ink); }
+
+  /* ---- 按钮 ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    min-height: 48px;
+    padding: var(--s-3) var(--s-5);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand-sm);
+    background: var(--paper-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--t-sm);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--line);
+    transition: transform var(--d-1) var(--e-out), box-shadow var(--d-1), background-color var(--d-1);
+  }
+  .btn:hover { background: #FFF8E1; }
+  .btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--line); }
+  .btn--big { font-size: var(--t-lg); padding: var(--s-4) var(--s-6); min-height: 56px; }
+  .btn--next { background: var(--yellow); border-color: var(--ink); }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+    padding-top: var(--s-5);
+    border-top: 1.5px dashed var(--line-soft);
+  }
+
+  /* ---- 封面 ---- */
+  .cover__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    gap: clamp(var(--s-5), 5vw, var(--s-7));
+    align-items: center;
+  }
+
+  h1 {
+    font-family: var(--f-hand);
+    font-size: var(--t-3xl);
+    letter-spacing: .02em;
+    margin-bottom: var(--s-3);
+  }
+
+  .lead {
+    font-size: var(--t-xl);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .sub-line, .cover__txt .sub { margin-bottom: var(--s-6); }
+
+  .contents {
+    display: grid;
+    gap: var(--s-2);
+    margin-bottom: var(--s-6);
+  }
+  .contents li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding-bottom: var(--s-2);
+    border-bottom: 1.5px dotted var(--line-soft);
+  }
+  .contents b {
+    font-family: var(--f-num);
+    color: var(--red-ink);
+    font-size: 1.05em;
+  }
+
+  .cover__art { display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
+  .scene { width: min(100%, 460px); height: auto; display: block; }
+
+  /* 手绘波浪线：静态小元素，值得上一次滤镜 */
+  .squiggle {
+    display: block;
+    width: 112px;
+    height: 9px;
+    margin: var(--s-1) 0 var(--s-4);
+    color: var(--yellow);
+    filter: url(#rough);
+    overflow: visible;
+  }
+
+  .note {
+    font-family: var(--f-hand);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--blue);
+  }
+  .note--tilt { transform: rotate(-3.5deg); }
+  .note--center { text-align: center; margin-top: var(--s-5); }
+
+  /* ---- 实验一：开关 ---- */
+  .bulbs {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--s-2);
+    margin-bottom: var(--s-5);
+  }
+
+  .bulb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-1);
+    aspect-ratio: 1 / 1.2;
+    padding: var(--s-1);
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+    background: #FFF;
+    color: var(--ink-3);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--d-2), border-color var(--d-2), color var(--d-2), transform var(--d-1);
+  }
+  .bulb svg {
+    width: 44%;
+    height: auto;
+    display: block;
+    overflow: visible;
+    transition: transform var(--d-2) var(--e-spring);
+  }
+  .bulb .g { fill: #FFF; stroke: #9C9A90; stroke-width: 2; transition: fill var(--d-2), stroke var(--d-2); }
+  .bulb .f { fill: none; stroke: #B4B2A8; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--d-2); }
+  .bulb .b { fill: none; stroke: #9C9A90; stroke-width: 2; stroke-linecap: round; transition: stroke var(--d-2); }
+  .bulb b {
+    font-family: var(--f-num);
+    font-size: clamp(.65rem, .55rem + .5vw, .85rem);
+    font-weight: 700;
+  }
+  .bulb:hover { border-color: var(--ink-3); }
+  .bulb[aria-pressed="true"] {
+    background: #FFF6D6;
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .bulb[aria-pressed="true"] svg { transform: translateY(-2px) scale(1.06); }
+  .bulb[aria-pressed="true"] .g { fill: var(--yellow); stroke: var(--ink); }
+  .bulb[aria-pressed="true"] .f { stroke: var(--red-ink); }
+  .bulb[aria-pressed="true"] .b { stroke: var(--ink); }
+
+  .readout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    flex-wrap: wrap;
+    padding: var(--s-4) 0;
+  }
+  .readout__num { display: flex; align-items: baseline; gap: var(--s-3); }
+  .label { font-size: var(--t-sm); color: var(--ink-3); }
+  .num {
+    font-family: var(--f-num);
+    font-size: var(--t-3xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .readout__swatch { display: flex; align-items: center; gap: var(--s-3); }
+  .swatch {
+    width: 56px; height: 56px;
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand-sm);
+    background: #000;
+  }
+  .cap { font-size: var(--t-cap); color: var(--ink-3); line-height: 1.5; }
+
+  .meter {
+    height: 14px;
+    margin: var(--s-2) 0 0;
+    background: #FFF;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .meter__fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2A2A28, #B9B5A8, #FFF);
+    transition: width var(--d-3) var(--e-out);
+  }
+  .meter__scale {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--s-1) 0 var(--s-6);
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+  }
+
+  .challenge {
+    margin-top: var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    border: 2px dashed var(--line);
+    border-radius: var(--r-hand-sm);
+    background: rgba(242, 183, 5, .07);
+    transition: background-color var(--d-3), border-color var(--d-3);
+  }
+  .challenge p { font-size: var(--t-sm); }
+  .challenge__state { margin-top: var(--s-2); font-family: var(--f-hand); color: var(--red-ink); }
+  .challenge.is-done {
+    background: rgba(76, 139, 63, .1);
+    border-color: var(--green);
+    border-style: solid;
+  }
+  .challenge.is-done .challenge__state { color: var(--green-ink); }
+  .challenge.is-done .challenge__state::before { content: "✓ "; }
+
+  .finding {
+    margin-top: var(--s-5);
+    padding-left: var(--s-4);
+    border-left: 5px solid var(--yellow);
+    font-size: var(--t-base);
+    color: var(--ink-2);
+    line-height: 1.75;
+  }
+  .finding b { color: var(--ink); }
+
+  /* ---- 实验二：猫 ---- */
+  .catlayout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    gap: clamp(var(--s-4), 4vw, var(--s-6));
+    align-items: center;
+  }
+  .cat svg { width: 100%; height: auto; display: block; }
+
+  #p-ear-l.on, #p-ear-r.on { stroke: var(--blue); stroke-width: 6; }
+  #p-eyes.on { fill: var(--blue); }
+  #p-whiskers.on { stroke: var(--blue); stroke-width: 6; }
+  #p-tail.on { stroke: var(--blue); stroke-width: 6; }
+
+  .feats { display: grid; gap: var(--s-2); }
+  .feats__title {
+    font-family: var(--f-hand);
+    font-size: 1.15rem;
+    color: var(--ink-2);
+    margin-bottom: var(--s-1);
+  }
+
+  .feat {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 52px;
+    padding: var(--s-2) var(--s-3);
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+    background: #FFF;
+    cursor: pointer;
+    transition: background-color var(--d-2), border-color var(--d-2);
+  }
+  .feat:hover { border-color: var(--ink-3); }
+  .feat input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .feat__box {
+    flex: none;
+    width: 24px; height: 24px;
+    border: 2px solid var(--ink);
+    border-radius: 6px 4px 7px 4px / 4px 7px 4px 6px;
+    background: #FFF;
+    position: relative;
+    transition: background-color var(--d-1);
+  }
+  .feat input:checked + .feat__box { background: var(--blue); }
+  .feat input:checked + .feat__box::after {
+    content: "";
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 6px; height: 12px;
+    border: solid #FFF;
+    border-width: 0 3px 3px 0;
+    transform: rotate(42deg);
+  }
+  .feat input:focus-visible + .feat__box { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .feat:has(input:checked) { background: rgba(47, 111, 178, .07); border-color: var(--blue); }
+
+  .verdict {
+    margin-top: var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand-sm);
+    background: #FFF;
+  }
+  .verdict__say { font-size: var(--t-lg); margin-bottom: var(--s-3); }
+  .verdict__say b { color: var(--blue); }
+
+  .conf {
+    height: 20px;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    background: rgba(42,42,40,.05);
+    overflow: hidden;
+  }
+  .conf__fill {
+    height: 100%;
+    width: 8%;
+    background: repeating-linear-gradient(45deg, var(--blue) 0 8px, #4A87C4 8px 16px);
+    transition: width var(--d-3) var(--e-out);
+  }
+  .conf__num { font-family: var(--f-num); font-size: var(--t-sm); color: var(--ink-3); margin-top: var(--s-2); }
+
+  /* ---- 实验三：信 ---- */
+  .letters { display: grid; gap: var(--s-4); max-width: 860px; }
+
+  .letter {
+    position: relative;
+    padding: var(--s-4) var(--s-5);
+    background: #FFFEF8;
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+    box-shadow: 2px 3px 0 rgba(42,42,40,.07);
+  }
+  .letter:nth-child(1) { transform: rotate(-.5deg); }
+  .letter:nth-child(2) { transform: rotate(.4deg); }
+  .letter:nth-child(3) { transform: rotate(-.3deg); }
+
+  .letter__body { font-size: var(--t-lg); line-height: 1.6; }
+  .letter__from {
+    margin-top: var(--s-2);
+    font-family: var(--f-hand);
+    color: var(--ink-3);
+    font-size: 1rem;
+  }
+  .letter__ask { display: flex; gap: var(--s-2); margin-top: var(--s-3); }
+  .btn--sm { min-height: 44px; padding: var(--s-2) var(--s-4); font-size: var(--t-sm); }
+
+  .letter__why {
+    display: none;
+    margin-top: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    font-size: var(--t-sm);
+    line-height: 1.7;
+    border-radius: var(--r-hand-sm);
+  }
+  .letter.is-judged .letter__ask { display: none; }
+  .letter.is-judged .letter__why { display: block; }
+  .letter.is-right .letter__why { background: rgba(76,139,63,.12); color: var(--green-ink); }
+  .letter.is-wrong .letter__why { background: rgba(217,79,61,.1); color: var(--red-ink); }
+  .letter.is-judged::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 2px solid currentColor;
+    border-radius: var(--r-hand-sm);
+    opacity: .18;
+    pointer-events: none;
+  }
+
+  /* ---- 毕业证 ---- */
+  .cert-card {
+    position: relative;
+    padding: clamp(var(--s-5), 4vw, var(--s-7));
+    background: #FFFDF4;
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand);
+    box-shadow: var(--sh-lift);
+  }
+  .cert__line { font-size: var(--t-lg); line-height: 2; }
+  .cert__name {
+    width: 9em;
+    max-width: 50%;
+    padding: 0 var(--s-2) 2px;
+    border: none;
+    border-bottom: 2px dashed var(--line);
+    background: transparent;
+    font: inherit;
+    font-family: var(--f-hand);
+    font-size: var(--t-xl);
+    color: var(--blue);
+    text-align: center;
+  }
+  .cert__name:focus { outline: none; border-bottom-color: var(--blue); }
+
+  .cert__list { margin: var(--s-3) 0; display: grid; gap: var(--s-2); }
+  .cert__list li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: var(--t-base);
+    padding-left: var(--s-2);
+  }
+  .cert__tick {
+    font-family: var(--f-num);
+    width: 1.6em;
+    flex: 0 0 auto;
+    color: var(--ink-3);
+    text-align: center;
+  }
+  /* 符号只由 CSS 出，HTML 里不放字符，否则会和 ::before 叠成两个 */
+  .cert__tick::before { content: "—"; }
+  .cert__list li[data-done="1"] .cert__tick { color: var(--green-ink); }
+  .cert__list li[data-done="1"] .cert__tick::before { content: "✓"; }
+
+  .cert__date { font-family: var(--f-hand); color: var(--ink-2); margin-top: var(--s-4); }
+
+  .cert__stamp {
+    position: absolute;
+    right: clamp(var(--s-4), 4vw, var(--s-6));
+    bottom: clamp(var(--s-4), 4vw, var(--s-6));
+    width: 92px; height: 92px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    font-family: var(--f-hand);
+    font-size: .95rem;
+    line-height: 1.2;
+    color: var(--red-ink);
+    border: 3px double var(--red);
+    border-radius: 50%;
+    transform: rotate(-12deg);
+    opacity: .85;
+  }
+
+  .cert__acts {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-top: var(--s-5);
+  }
+}
+
+/* ============ pages ============ */
+@layer pages {
+  @media (max-width: 900px) {
+    .cover__grid { grid-template-columns: 1fr; }
+    .cover__art { order: 2; margin-top: var(--s-4); }
+    .scene { width: min(72%, 300px); }
+    .catlayout { grid-template-columns: 1fr; }
+    .tab__t { display: none; }
+    .tab { padding-inline: var(--s-2); }
+  }
+
+  @media (max-width: 480px) {
+    .brand__mark svg { width: 32px; height: 32px; }
+    .tabs { gap: 0; }
+    .tab { padding-inline: var(--s-2); }
+    .top { padding-inline: var(--s-3); }
+  }
+
+  @media (max-width: 640px) {
+    .bulbs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); }
+    .bulb { aspect-ratio: 1 / 1.05; }
+    .readout { gap: var(--s-3); }
+    .num { font-size: var(--t-2xl); }
+    /* 手机上按自然顺序：次要的「回到封面」在上，「下一个」在下、离拇指更近 */
+    .pager { flex-direction: column; }
+    .pager .btn { width: 100%; }
+    .cert__stamp { position: static; margin: var(--s-4) auto 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media print {
+    @page { size: A4 portrait; margin: 16mm; }
+
+    body { background: #fff !important; }
+    .top, .foot, .pager, .cert__acts, .note--center { display: none !important; }
+    .page { display: none !important; }
+    #cert { display: block !important; }
+    main { width: 100%; padding: 0; }
+
+    .sheet {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      background: none;
+    }
+    .cert-card {
+      box-shadow: none;
+    }
+    /* 整块在可打印区里垂直居中，避免证书压在纸的上半截 */
+    .sheet--cert {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 245mm;
+    }
+    .squiggle { filter: none; }
+    .cert__name { border-bottom-style: solid; border-bottom-color: var(--ink-3); }
+  }
+}
+
+/* ============ motion ============ */
+@layer motion {
+  @media (prefers-reduced-motion: no-preference) {
+
+    .page.is-on { animation: pageIn var(--d-4) var(--e-out) both; }
+
+    /* 标题下的手绘线：进场时画出来 */
+    .squiggle path {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: drawLine .55s .08s var(--e-out) forwards;
+    }
+
+    /* 封面：豆苗长出来，叶子张开，灯泡呼吸，眼睛偶尔眨 */
+    .sc-stem {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: drawLine .8s .12s var(--e-out) forwards;
+    }
+    .sc-leaf {
+      transform-box: fill-box;
+      opacity: 0;
+      transform: scale(.28) rotate(-6deg);
+      animation: leafPop .6s var(--e-spring) forwards;
+    }
+    .sc-leaf-l { transform-origin: 100% 100%; animation-delay: .48s; }
+    .sc-leaf-r { transform-origin: 0% 100%; animation-delay: .62s; }
+    .sc-eye { transform-box: fill-box; transform-origin: 50% 50%; animation: blink 5.6s 1.2s infinite; }
+    .sc-glow { animation: glowPulse 3.2s ease-in-out infinite; }
+
+    /* 猫：尾巴慢慢摆，偶尔眨眼 */
+    .cat__tail { transform-box: fill-box; transform-origin: 6% 88%; animation: wag 2.8s ease-in-out infinite; }
+    .cat__eye { transform-box: fill-box; transform-origin: 50% 50%; animation: blink 6.4s .6s infinite; }
+  }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes leafPop {
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95%           { transform: scaleY(.1); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: .14; }
+    50%      { opacity: .4; }
+  }
+  @keyframes wag {
+    0%, 100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(6deg); }
+  }
+}
+/* ===================================================================
+   关卡、答题、锁定状态 —— 这一层是在基础版式上加的
+   =================================================================== */
+@layer components {
+
+  /* 顶部提示条，点错入口时用 */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 50;
+    margin: 0;
+    padding: var(--s-3) var(--s-5);
+    max-width: calc(100% - var(--s-6));
+    background: var(--ink);
+    color: var(--paper);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    border-radius: var(--r-hand-sm);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 16px);
+    transition: opacity var(--d-2) var(--e-out), transform var(--d-2) var(--e-out);
+  }
+  .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+  .cover__note {
+    margin-top: var(--s-3);
+    font-family: var(--f-hand);
+    font-size: 1rem;
+    color: var(--ink-3);
+  }
+
+  .contents em {
+    margin-left: auto;
+    font-style: normal;
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+  }
+
+  .steplabel {
+    margin: var(--s-6) 0 var(--s-3);
+    padding-bottom: var(--s-1);
+    font-family: var(--f-hand);
+    font-size: 1.15rem;
+    color: var(--ink-2);
+    border-bottom: 1.5px dotted var(--line-soft);
+  }
+
+  /* ---- 实验一：三关 ---- */
+  .tasks {
+    max-width: 520px;
+    margin-top: var(--s-5);
+    margin-inline: auto;
+    padding: var(--s-4) var(--s-5);
+    border: 2px dashed var(--line);
+    border-radius: var(--r-hand-sm);
+    background: rgba(242, 183, 5, .07);
+  }
+  .tasks__title {
+    margin-bottom: var(--s-3);
+    font-family: var(--f-hand);
+    font-size: 1.15rem;
+    color: var(--ink-2);
+  }
+  .tasklist {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tasklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    font-size: var(--t-base);
+    line-height: 1.45;
+  }
+  .tasklist li > span:last-child { display: block; }
+  .tasklist li i {
+    display: block;
+    font-style: normal;
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+  }
+  .tasklist li.is-done > span:last-child { opacity: .55; }
+  .tasklist li.is-done b { text-decoration: line-through; }
+
+  .tick {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 6px 4px 7px 4px / 4px 7px 4px 6px;
+    position: relative;
+  }
+  .tasklist li.is-done .tick {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .tasklist li.is-done .tick::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid #fff;
+    border-width: 0 3px 3px 0;
+    transform: rotate(42deg);
+  }
+
+  .tasks__now {
+    margin-top: var(--s-3);
+    font-family: var(--f-hand);
+    color: var(--red-ink);
+  }
+  .tasks.is-all .tasks__now { color: var(--green-ink); }
+
+  /* ---- 实验二：四道题 ---- */
+  .quiz { display: grid; gap: var(--s-4); max-width: 820px; }
+
+  .q {
+    padding: var(--s-4) var(--s-5);
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+  }
+  .q.is-right { border-color: var(--green); background: rgba(76, 139, 63, .05); }
+  .q__ask { margin-bottom: var(--s-3); font-size: var(--t-base); line-height: 1.6; }
+  .q__opts { display: grid; gap: var(--s-2); }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 48px;
+    padding: var(--s-3) var(--s-4);
+    text-align: left;
+    background: var(--paper-2);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+    font: inherit;
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color var(--d-1), border-color var(--d-1), opacity var(--d-1);
+  }
+  .opt::before {
+    content: "";
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--ink-3);
+    border-radius: 50%;
+    background: #fff;
+    transition: border-color var(--d-1), background var(--d-1);
+  }
+  .opt:hover { background: #FFF8E1; border-color: var(--ink-3); }
+  .opt.is-wrong::before { border-color: var(--red); background: rgba(217, 79, 61, .18); }
+  .opt:disabled { cursor: default; }
+
+  .q.is-right .opt { opacity: .45; }
+  .q.is-right .opt.is-picked {
+    opacity: 1;
+    border-color: var(--green);
+    background: rgba(76, 139, 63, .14);
+  }
+  .q.is-right .opt.is-picked::before {
+    content: "";
+    border-color: var(--green);
+    background: radial-gradient(circle at center, var(--green) 0 5px, #fff 5.5px);
+  }
+  .opt.is-wrong { border-color: var(--red); background: rgba(217, 79, 61, .08); }
+
+  .q__fb { margin-top: var(--s-2); font-size: var(--t-sm); line-height: 1.6; }
+  .q__fb.is-ok { color: var(--green-ink); }
+  .q__fb.is-bad { color: var(--red-ink); }
+
+  /* ---- 实验三：答错可以再来 ---- */
+  .letter.is-right { border-color: var(--green); }
+  .letter.is-right .letter__ask { display: none; }
+  .letter.is-right .letter__why {
+    display: block;
+    background: rgba(76, 139, 63, .12);
+    color: var(--green-ink);
+  }
+  .letter.is-wrong .letter__why {
+    display: block;
+    background: rgba(217, 79, 61, .10);
+    color: var(--red-ink);
+  }
+  .letter.is-wrong .btn[data-pick].is-wrong {
+    border-color: var(--red);
+    color: var(--red-ink);
+    opacity: .65;
+    text-decoration: line-through;
+  }
+  .letter.is-right::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 2px solid var(--green);
+    border-radius: var(--r-hand-sm);
+    opacity: .2;
+    pointer-events: none;
+  }
+
+  /* ---- 结论块：做完才出现 ---- */
+  .finding {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    position: relative;
+  }
+  .finding[hidden] { display: none; }
+  .done-badge {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    margin-top: -2px;
+  }
+
+  .lockhint {
+    margin-top: var(--s-3);
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+  }
+  .lockhint.is-off { display: none; }
+
+  .btn:disabled {
+    opacity: .42;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .btn:disabled:hover { background: var(--paper-2); }
+
+  .tab[data-locked="1"] { opacity: .42; }
+}
+
+/* ===================================================================
+   动态美术：都是 transform / opacity，能关
+   =================================================================== */
+@layer motion {
+
+  .sc-plant {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+  .bit {
+    font-family: var(--f-num);
+    font-size: 24px;
+    font-weight: 700;
+    opacity: .22;
+  }
+
+  .cat__ear { transform-box: fill-box; }
+  #p-ear-l { transform-origin: 100% 100%; }
+  #p-ear-r { transform-origin: 0% 100%; }
+
+  @media (prefers-reduced-motion: no-preference) {
+
+    .sc-plant { animation: sway 6.5s ease-in-out infinite; }
+
+    .bit.b1 { animation: floaty 6.2s ease-in-out infinite; }
+    .bit.b2 { animation: floaty 7.8s ease-in-out infinite; animation-delay: -2s; }
+    .bit.b3 { animation: floaty 9.1s ease-in-out infinite; animation-delay: -4.4s; }
+    .bit.b4 { animation: floaty 7.1s ease-in-out infinite; animation-delay: -1.2s; }
+
+    .tasklist li.is-done .tick { animation: popIn .32s var(--e-spring) both; }
+
+    .finding:not([hidden]) { animation: popIn .45s var(--e-out) both; }
+
+    .letter.is-wrong { animation: shake .4s ease-in-out; }
+    .opt.is-wrong { animation: shake .38s ease-in-out; }
+
+    .cat__ear.twitch { animation: twitch .45s ease-in-out; }
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-1.2deg); }
+    50%      { transform: rotate(1.4deg); }
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0);     opacity: .18; }
+    50%      { transform: translateY(-10px); opacity: .42; }
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(6px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes twitch {
+    0%, 100% { transform: rotate(0); }
+    45%      { transform: rotate(-8deg); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-5px); }
+    40%      { transform: translateX(5px); }
+    60%      { transform: translateX(-3px); }
+    80%      { transform: translateX(3px); }
+  }
+}
+
+/* ===================================================================
+   目标条 / 二进制读数 / 实验二的大字提示
+   =================================================================== */
+@layer components {
+
+  /* 当前这一关做什么，放在开关正上方，不让人找 */
+  .goal {
+    margin: var(--s-5) 0 var(--s-3);
+    padding: var(--s-4) var(--s-5);
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-left: 8px solid var(--red);
+    border-radius: var(--r-hand-sm);
+    transition: border-color var(--d-3), background-color var(--d-3);
+  }
+  .goal__kick {
+    font-family: var(--f-num);
+    font-size: var(--t-sm);
+    letter-spacing: .04em;
+    color: var(--ink-3);
+  }
+  .goal__main {
+    margin: var(--s-1) 0;
+    font-size: var(--t-2xl);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .goal__main b {
+    color: var(--red-ink);
+    font-size: 1.15em;
+  }
+  .goal__hint {
+    font-size: var(--t-base);
+    color: var(--ink-2);
+  }
+  .goal.is-all {
+    border-left-color: var(--green);
+    background: rgba(76, 139, 63, .08);
+  }
+  .goal.is-all .goal__main { color: var(--green-ink); }
+  .goal.is-all .goal__main b { color: var(--green-ink); }
+
+  /* 每个灯泡下面那排 0/1，和开关共用一套列宽，所以能对齐 */
+  .bitsline {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    text-align: center;
+  }
+  .bitsline span {
+    font-family: var(--f-num);
+    font-size: var(--t-xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink-3);
+    opacity: .4;
+    transition: color var(--d-2), opacity var(--d-2), transform var(--d-2) var(--e-spring);
+  }
+  .bitsline span.on {
+    color: var(--blue);
+    opacity: 1;
+    transform: translateY(-2px) scale(1.15);
+  }
+  .bitsnote {
+    margin: var(--s-3) 0 var(--s-5);
+    font-size: var(--t-cap);
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  /* 实验二第一步：先大，勾满四个之后缩回原位 */
+  .callout {
+    --callout-big: clamp(2.2rem, 1.2rem + 4vw, 3rem);
+    margin: var(--s-6) 0 var(--s-4);
+    padding-bottom: var(--s-3);
+    font-family: var(--f-hand);
+    font-size: var(--callout-big);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--red-ink);
+    border-bottom: 4px solid var(--red);
+  }
+  .callout.is-done {
+    padding-bottom: var(--s-1);
+    font-size: 1.15rem;
+    color: var(--ink-2);
+    border-bottom-width: 1.5px;
+    border-bottom-style: dotted;
+    border-bottom-color: var(--line-soft);
+    animation: settleStep 1.5s var(--e-out) both;
+  }
+
+  @media (max-width: 640px) {
+    .bitsline { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--s-2); }
+    .goal__main { font-size: var(--t-xl); }
+  }
+}
+
+/* ===================================================================
+   美术加强：入场编排、数字跳动、盖章、悬停
+   只动 transform / opacity / translate，全部可被 reduced-motion 关掉
+   =================================================================== */
+
+@layer motion {
+
+  /* 数字要能 transform，先给它一个盒子 */
+  .num,
+  .conf__num { display: inline-block; }
+
+  /* 目标条有变化时闪一下，让人注意到"换关了" */
+  .goal.is-bump { animation: goalIn .5s var(--e-out) both; }
+
+  /* 证书印章：像真盖上去的 */
+  .cert__stamp { animation: stampIn .6s .3s var(--e-spring) both; }
+
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* ---- 封面：一层一层搭起来 ---- */
+    .sc-books   { animation: riseIn .5s .05s var(--e-out) both; }
+    .sc-pencil  { animation: riseIn .45s .22s var(--e-out) both; }
+    .sc-pot     { animation: riseIn .45s .3s var(--e-out) both; }
+    .sc-rim     { animation: riseIn .45s .38s var(--e-out) both; }
+    .sc-bulb    { animation: riseIn .5s .55s var(--e-out) both; }
+    .sc-shadow  { animation: fadeIn .6s .1s var(--e-out) both; }
+
+    /* ---- 数字跳动 ---- */
+    .num.is-bump,
+    .conf__num.is-bump { animation: bump .3s var(--e-spring); }
+
+    /* ---- 过关的勾：像盖了个章 ---- */
+    .tasklist li.is-done .tick { animation: stampTick .36s var(--e-spring) both; }
+
+    /* ---- 结论出现时，小豆苗先冒头，文字随后 ---- */
+    .finding:not([hidden]) .done-badge { animation: badgeIn .55s .08s var(--e-spring) both; }
+    .finding:not([hidden]) p { animation: fadeUp .4s .2s var(--e-out) both; }
+
+    /* ---- 悬停：整个卡片轻轻抬一下 ---- */
+    .opt:hover,
+    .feat:hover,
+    .letter:hover { translate: 0 -1px; }
+
+    /* ---- 顶部那只小豆苗，悬停时歪一下头 ---- */
+    .brand:hover .brand__mark svg,
+    .brand:focus-visible .brand__mark svg { animation: lean .55s var(--e-spring); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cert__stamp { animation: none; transform: rotate(-12deg); }
+  }
+
+  /* ---- 组件上的过渡（不依赖动效开关，纯状态反馈）---- */
+  .opt,
+  .feat,
+  .letter { transition: translate .14s var(--e-out), background-color var(--d-2), border-color var(--d-2); }
+
+  .brand__mark svg { transform-origin: 50% 88%; }
+
+  @keyframes goalIn {
+    from { opacity: .35; transform: translateY(-5px); }
+    to   { opacity: 1;   transform: none; }
+  }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes bump {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.14); }
+    100% { transform: scale(1); }
+  }
+  @keyframes stampTick {
+    0%   { transform: scale(.35) rotate(-22deg); opacity: 0; }
+    60%  { transform: scale(1.15) rotate(3deg);  opacity: 1; }
+    100% { transform: scale(1) rotate(0); }
+  }
+  @keyframes badgeIn {
+    0%   { transform: scale(.4) rotate(-14deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes lean {
+    0%, 100% { transform: rotate(0); }
+    38%      { transform: rotate(-9deg); }
+    70%      { transform: rotate(4deg); }
+  }
+  @keyframes stampIn {
+    0%   { transform: rotate(-26deg) scale(1.45); opacity: 0; }
+    100% { transform: rotate(-12deg) scale(1);    opacity: .85; }
+  }
+}
+
+/* ===================================================================
+   打印时把动效一次性落定
+   带 both 的动画在没跑完时会让元素停在初始帧（透明度 0），
+   而"保存证书"是点完立刻进打印的快照，一眨眼就可能印不出来。
+   =================================================================== */
+@media print {
+  .page.is-on { animation: none !important; }
+  .squiggle path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .cert__stamp {
+    animation: none !important;
+    transform: rotate(-12deg) !important;
+    opacity: .85 !important;
+  }
+  .done-badge,
+  .finding p { animation: none !important; }
+}
+
+/* 大字提示收回去的节奏：先停一下，强调一次，再缩小归位
+   1.5s：前 25% 不动 → 25–45% 涨到 1.14 倍 → 45–100% 收到小号 */
+@keyframes settleStep {
+  0%, 25% {
+    font-size: var(--callout-big);
+    color: var(--red-ink);
+    border-bottom-width: 4px;
+    border-bottom-color: var(--red);
+    padding-bottom: var(--s-3);
+  }
+  45% {
+    font-size: calc(var(--callout-big) * 1.14);
+    color: var(--red-ink);
+    border-bottom-width: 4px;
+    border-bottom-color: var(--red);
+    padding-bottom: var(--s-3);
+  }
+  100% {
+    font-size: 1.15rem;
+    color: var(--ink-2);
+    border-bottom-width: 1.5px;
+    border-bottom-color: var(--line-soft);
+    padding-bottom: var(--s-1);
+  }
+}
+
+/* ===================================================================
+   实验一改版：四位开关，每位上面写 0/1、下面写位权，底下一行算式
+   （放在 pages 层，才能压过前面基础层里的 8 列与 aspect-ratio）
+   =================================================================== */
+@layer pages {
+  .bulbs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  .bulb {
+    aspect-ratio: auto;
+    min-height: clamp(124px, 20vw, 156px);
+    padding: var(--s-3) var(--s-2);
+  }
+  .bulb__val {
+    font-family: var(--f-num);
+    font-size: var(--t-xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink-3);
+    transition: color var(--d-2);
+  }
+  .bulb[aria-pressed="true"] .bulb__val { color: var(--blue); }
+  .bulb b {
+    font-size: 1.05rem;
+    color: var(--ink-3);
+  }
+  .bulb[aria-pressed="true"] b { color: var(--ink); }
+
+  .eq {
+    max-width: 660px;
+    margin: var(--s-4) auto var(--s-5);
+    padding: var(--s-3) var(--s-4);
+    text-align: center;
+    font-family: var(--f-num);
+    font-size: clamp(.95rem, .82rem + .6vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--ink-2);
+    background: #FFF;
+    border: 2px dashed var(--line);
+    border-radius: var(--r-hand-sm);
+  }
+  .eq i {
+    font-style: normal;
+    color: var(--ink-3);
+  }
+  .eq i.on {
+    color: var(--blue);
+    font-weight: 700;
+  }
+  .eq__sum b {
+    font-size: 1.3em;
+    color: var(--red-ink);
+  }
+}
+
+/* ===================================================================
+   常驻小豆苗（桌宠）
+   =================================================================== */
+@layer components {
+  .pet {
+    position: fixed;
+    right: clamp(12px, 2.6vw, 26px);
+    bottom: clamp(12px, 2.6vw, 26px);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--s-2);
+  }
+
+  .pet__btn {
+    width: clamp(62px, 8.5vw, 86px);
+    height: clamp(62px, 8.5vw, 86px);
+    padding: 3px;
+    display: grid;
+    place-items: center;
+    background: var(--paper-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    box-shadow: 2px 3px 0 rgba(42, 42, 40, .16);
+    cursor: pointer;
+    transition: transform var(--d-1) var(--e-out), box-shadow var(--d-1);
+  }
+  .pet__btn svg { width: 100%; height: 100%; display: block; }
+  .pet__btn:hover { translate: 0 -2px; }
+  .pet__btn:active { transform: translateY(1px) scale(.97); }
+
+  .pet__panel {
+    position: relative;
+    width: min(268px, 74vw);
+    padding: var(--s-4);
+    padding-right: var(--s-6);
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand);
+    box-shadow: var(--sh-lift);
+  }
+  /* 小气泡的尖，指向下面的按钮 */
+  .pet__panel::after {
+    content: "";
+    position: absolute;
+    right: 26px;
+    bottom: -9px;
+    width: 16px;
+    height: 16px;
+    background: var(--paper-2);
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: rotate(45deg);
+  }
+
+  .pet__say {
+    font-size: var(--t-sm);
+    line-height: 1.7;
+    color: var(--ink);
+    min-height: 3em;
+  }
+  .pet__acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+  }
+  .pet__act {
+    min-height: 40px;
+    padding: var(--s-2) var(--s-3);
+    background: var(--paper);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: var(--r-hand-sm);
+    font: inherit;
+    font-size: var(--t-cap);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--d-1), border-color var(--d-1);
+  }
+  .pet__act:hover { background: #FFF8E1; border-color: var(--ink-3); }
+
+  .pet__close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .pet__close:hover { color: var(--ink); background: rgba(42, 42, 40, .07); }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: no-preference) {
+
+  }
+
+  @media print { .pet { display: none !important; } }
+}
+
+/* ===================================================================
+   桌宠的角色动画：呼吸、眨眼、叶子摆、被摸时蹦一下
+   =================================================================== */
+@layer motion {
+  .pet__body { transform-box: fill-box; transform-origin: 50% 100%; }
+  .pet__eye  { transform-box: fill-box; transform-origin: 50% 50%; }
+  .pet__leaf--l { transform-box: fill-box; transform-origin: 100% 100%; }
+  .pet__leaf--r { transform-box: fill-box; transform-origin: 0% 100%; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pet__body { animation: petBreath 3.8s ease-in-out infinite; }
+    .pet__eye  { animation: petBlink 5.2s infinite; }
+    .pet__leaf--l { animation: leafWave 4.6s ease-in-out infinite; }
+    .pet__leaf--r { animation: leafWave 4.6s ease-in-out infinite reverse; }
+  }
+
+  .pet.is-happy .pet__btn { animation: petHop .72s cubic-bezier(.34, 1.56, .64, 1); }
+}
+
+@keyframes petBreath {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.025, .975); }
+}
+@keyframes petBlink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96%           { transform: scaleY(.12); }
+}
+@keyframes leafWave {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(6deg); }
+}
+@keyframes petHop {
+  0%   { transform: translateY(0) scale(1, 1); }
+  28%  { transform: translateY(-11px) scale(.95, 1.06); }
+  52%  { transform: translateY(0) scale(1.07, .93); }
+  74%  { transform: translateY(-4px) scale(.99, 1.01); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* 平板档：封面切成单列后文字会被拉满，限一下行宽 */
+@layer pages {
+  @media (max-width: 900px) {
+    .cover__txt { max-width: 36rem; }
+  }
+}
+
+/* ===================================================================
+   桌宠 v2：可拖动 + 自己溜达
+   =================================================================== */
+@layer pages {
+  .pet {
+    right: auto;
+    bottom: auto;
+    left: 0;
+    top: 0;
+    max-width: 74vw;
+  }
+  .pet.is-dragging { will-change: transform; }
+
+  .pet__btn {
+    cursor: grab;
+    touch-action: none;       /* 拖的时候别把页面一起滚 */
+  }
+  .pet.is-dragging .pet__btn {
+    cursor: grabbing;
+    translate: none;
+  }
+  .pet.is-dragging .pet__btn svg { transition: none; }
+  .pet__btn svg { transition: transform .32s var(--e-out); }
+  .pet.is-flip .pet__btn svg { transform: scaleX(-1); }
+
+  /* 自己冒一句话的小气泡 */
+  .pet__bubble {
+    position: relative;
+    max-width: 230px;
+    padding: var(--s-2) var(--s-3);
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand-sm);
+    box-shadow: 2px 3px 0 rgba(42, 42, 40, .12);
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .pet__bubble[hidden] { display: none; }
+  .pet__bubble.is-on { animation: bubbleIn .26s var(--e-out) both; }
+  .pet__bubble::after {
+    content: "";
+    position: absolute;
+    right: 26px;
+    bottom: -8px;
+    width: 14px;
+    height: 14px;
+    background: var(--paper-2);
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: rotate(45deg);
+  }
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes walkBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: no-preference) {
+    .pet.is-walking .pet__btn { animation: walkBob .52s ease-in-out 2; }
+  }
+}
+
+/* ===================================================================
+   桌宠定位修正：面板浮在按钮上方，不占位。
+   否则一开气泡，容器变高，按左上角算的夹取会把整只宠物挪走，
+   收起后也回不到原位。
+   =================================================================== */
+@layer pages {
+  .pet {
+    width: min(268px, 74vw);
+    pointer-events: none;       /* 容器本身不吃点击，只有按钮和面板吃 */
+  }
+  .pet__btn { pointer-events: auto; }
+
+  .pet__panel,
+  .pet__bubble {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: 100%;
+    pointer-events: auto;
+  }
+  .pet__bubble {
+    width: auto;
+    max-width: 230px;
+  }
+
+  /* 被拖到贴近顶部时，气泡改朝下开，别顶出屏幕 */
+  .pet.is-below .pet__panel,
+  .pet.is-below .pet__bubble {
+    bottom: auto;
+    top: calc(100% + 10px);
+  }
+  .pet.is-below .pet__panel::after,
+  .pet.is-below .pet__bubble::after {
+    bottom: auto;
+    top: -8px;
+    transform: rotate(-135deg);
+  }
+}
+
+/* ===================================================================
+   「摸摸我」小气泡 + 滚动时自动变淡
+   =================================================================== */
+@layer pages {
+  .pet__btn { position: relative; }
+
+  .pet__tip {
+    position: absolute;
+    right: calc(100% + 10px);
+    bottom: 14px;
+    padding: 3px 10px;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 2px 2px 0 rgba(42, 42, 40, .12);
+    font-size: var(--t-cap);
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: nowrap;
+    pointer-events: none;      /* 点它等于点宠物本身 */
+  }
+  .pet__tip[hidden] { display: none; }
+  .pet__tip::after {
+    content: "";
+    position: absolute;
+    right: -7px;
+    bottom: 9px;
+    width: 11px;
+    height: 11px;
+    background: var(--paper-2);
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: rotate(-45deg);
+  }
+
+  /* 滚动时淡下去，别挡正文；淡的是按钮和气泡，不碰容器的 transform 过渡 */
+  .pet__btn { transition: opacity .35s var(--e-out); }
+  .pet.is-dim .pet__btn,
+  .pet.is-dim .pet__tip { opacity: .34; }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: no-preference) {
+    .pet__tip:not([hidden]) { animation: tipNudge 2.8s ease-in-out infinite; }
+  }
+  @keyframes tipNudge {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(-3px); }
+  }
+}
+
+/* ===================================================================
+   窄屏修正：证书页排版 + 桌宠缩小
+   =================================================================== */
+@layer pages {
+  @media (max-width: 560px) {
+    /* 标题别在「实验|室」中间断开 */
+    #cert-h { font-size: clamp(1.45rem, 6vw, 1.9rem); }
+
+    /* 兹证明 ___ 同学：三样一起缩，才排得进一行 */
+    .cert__line { font-size: 1.05rem; line-height: 1.9; }
+    .cert__name {
+      width: 6.5em;
+      max-width: 55%;
+      font-size: 1.25rem;
+    }
+
+    /* 打勾项：符号和文字顶部对齐，换行时不再错位 */
+    .cert__list li {
+      align-items: flex-start;
+      gap: var(--s-2);
+    }
+    .cert__tick { padding-top: .1em; }
+  }
+
+  @media (max-width: 700px) {
+    /* 手机上桌宠收小一点，少挡点正文 */
+    .pet__btn {
+      width: 56px;
+      height: 56px;
+    }
+    .pet { width: min(230px, 72vw); }
+    .pet__panel { width: 100%; padding: var(--s-3); padding-right: var(--s-5); }
+  }
+}
+
+/* ===================================================================
+   开场：封面那台电脑先打招呼，再飞进右下角变成桌宠
+   =================================================================== */
+@layer pages {
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .intro[hidden] { display: none; }
+
+  .intro__char {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 258px;
+    transform-origin: top left;
+  }
+  .intro__char svg { width: 100%; height: 100%; display: block; }
+
+  .intro__bubble {
+    position: absolute;
+    left: 16px;
+    top: 96px;
+    padding: var(--s-3) var(--s-4);
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: var(--r-hand);
+    box-shadow: var(--sh-lift);
+    font-size: var(--t-base);
+    line-height: 1.7;
+    color: var(--ink);
+    transition: opacity .3s var(--e-out), transform .3s var(--e-out);
+  }
+  .intro__bubble b {
+    display: block;
+    margin-bottom: 2px;
+    font-size: var(--t-md);
+    color: var(--red-ink);
+  }
+  .intro__bubble.is-out { opacity: 0; transform: translateY(-8px); }
+
+  .pet.is-hidden { opacity: 0; pointer-events: none; }
+}
+
+/* 实验二：线索没勾满，题目不出现 */
+@layer pages {
+
+
+  /* 开场期间「开始做实验」不可用，等桌宠落定再放开 */
+  .is-intro .cover__txt .btn { pointer-events: none; opacity: .35; }
+}
+
+/* 手机端开场：盖一层纸色遮罩，在屏幕中间演，不滚动 */
+@layer pages {
+  .intro.is-veil { background: #FBF6E9; }
+}
+
+/* 手机端开场遮罩必须从首帧就在，不能等 JS */
+@layer pages {
+  .intro__char { opacity: 0; }
+  @media (max-width: 899px) {
+    .intro { background: #FBF6E9; }
+  }
+}
+
+/* 开场那几秒把页面锁住：气泡和画面一起定住，不跟着滚 */
+@layer pages {
+  body.is-intro { overflow: hidden; }
+  body.is-intro .top,
+  body.is-intro .foot { pointer-events: none; }
+}
+
+/* 信件答错时的引导：通用三问 + 这封信的具体疑点 */
+@layer pages {
+  .letter__why .letter__tip {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--ink-2);
+  }
+}
+
+/* 气泡在 JS 摆好位置之前不许露脸（否则会先闪现在左上角） */
+@layer pages {
+  .intro__bubble { opacity: 0; }
+}
+
+</style>
+</head>
+<body class="is-intro">
+<a class="skip" href="#main">跳到正文</a>
+
+<!-- 手绘波浪线用的小滤镜；顺便放一个可以复用的迷你豆苗 -->
+<svg class="defs" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <filter id="rough">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+      <symbol id="pet-char" viewBox="0 0 80 86">
+        <g class="pet__body">
+          <path d="M40 30V14" stroke="#3F7A34" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+          <path class="pet__leaf pet__leaf--l" d="M40 17c-7 0-12-5-12-11 7 0 12 5 12 11z" fill="#8FB86E" stroke="#3F7A34" stroke-width="2.6" stroke-linejoin="round"/>
+          <path class="pet__leaf pet__leaf--r" d="M40 17c7 0 12-5 12-11-7 0-12 5-12 11z" fill="#8FB86E" stroke="#3F7A34" stroke-width="2.6" stroke-linejoin="round"/>
+          <rect x="7" y="29" width="66" height="46" rx="9" fill="#FFFDF6" stroke="#2A2A28" stroke-width="3.4"/>
+          <rect x="14" y="36" width="52" height="32" rx="5" fill="#FFF6D6" stroke="#2A2A28" stroke-width="2.4"/>
+          <ellipse class="pet__eye" cx="31" cy="50" rx="2.6" ry="3" fill="#2A2A28"/>
+          <ellipse class="pet__eye" cx="49" cy="50" rx="2.6" ry="3" fill="#2A2A28"/>
+          <path d="M35 58q5 4 10 0" fill="none" stroke="#2A2A28" stroke-width="2.4" stroke-linecap="round"/>
+          <rect x="34" y="75" width="12" height="5" fill="#FFFDF6" stroke="#2A2A28" stroke-width="2.4"/>
+          <rect x="26" y="79" width="28" height="4" rx="2" fill="#FFFDF6" stroke="#2A2A28" stroke-width="2.4"/>
+        </g>
+      </symbol>
+    <symbol id="sprout-mini" viewBox="0 0 48 48">
+      <path d="M24 33V20" stroke="#3F7A34" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+      <path d="M24 22c-6 0-11-5-11-11 6 0 11 5 11 11z" fill="#8FB86E" stroke="#3F7A34" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M24 22c6 0 11-5 11-11-6 0-11 5-11 11z" fill="#8FB86E" stroke="#3F7A34" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M15 33h18l-2 8H17z" fill="#E0C9A6" stroke="#9C7B52" stroke-width="2.2" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <a class="brand" href="#cover" data-go="cover">
+    <span class="brand__mark" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="40" height="40">
+        <path d="M20 27V16" stroke="#4C8B3F" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M20 18c-5 0-9-4-9-9 5 0 9 4 9 9z" fill="#8FB86E" stroke="#3F7A34" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M20 18c5 0 9-4 9-9-5 0-9 4-9 9z" fill="#8FB86E" stroke="#3F7A34" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M11.5 27h17l-2 8h-13z" fill="#E8D7BE" stroke="#A98763" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="16.5" cy="30.5" r="1.2" fill="#3A3A34"/>
+        <circle cx="23.5" cy="30.5" r="1.2" fill="#3A3A34"/>
+      </svg>
+    </span>
+    <span class="brand__txt">豆苗实验室</span>
+  </a>
+
+  <nav class="tabs" aria-label="实验目录">
+    <button class="tab" data-go="exp1"><span class="tab__n">01</span><span class="tab__t">开关就是数字</span></button>
+    <button class="tab" data-go="exp2" data-locked="1"><span class="tab__n">02</span><span class="tab__t">AI 认猫</span></button>
+    <button class="tab" data-go="exp3" data-locked="1"><span class="tab__n">03</span><span class="tab__t">能信吗</span></button>
+    <button class="tab" data-go="cert" data-locked="1"><span class="tab__n">✓</span><span class="tab__t">毕业证</span></button>
+  </nav>
+</header>
+
+<p class="toast" id="toast" role="status" aria-live="polite"></p>
+
+<main id="main">
+
+  <!-- ================= 封面 ================= -->
+  <section class="page page--cover" id="cover" data-page="cover" aria-labelledby="cover-h">
+    <div class="cover__grid">
+      <div class="cover__txt">
+        <p class="kicker">河海大学计算机与软件学院 ·「豆苗逐智·童享科技」</p>
+        <h1 id="cover-h">豆苗实验室</h1>
+        <p class="lead">三个小实验，看懂一台计算机</p>
+        
+
+        <ul class="contents">
+          <li><b>01</b><span>开关就是数字</span><em>4 关</em></li>
+          <li><b>02</b><span>AI 是怎么认出猫的</span><em>4 个线索 + 4 题</em></li>
+          <li><b>03</b><span>这封信能信吗</span><em>5 封</em></li>
+        </ul>
+
+        <button class="btn btn--big" data-go="exp1">开始做实验 <span aria-hidden="true">→</span></button>
+        
+      </div>
+
+      <div class="cover__art">
+        <svg class="scene" viewBox="0 0 400 396" role="img" aria-label="一台会笑的电脑，屏幕上方长出一株豆苗，下面是键盘">
+          <g>
+            <ellipse class="sc-shadow" cx="200" cy="388" rx="152" ry="6" fill="#2A2A28" opacity="0.07"/>
+
+            <!-- 飘着的 0 和 1 -->
+            <g class="sc-bits" fill="#2A2A28">
+              <text class="bit b1" x="98" y="148">0</text>
+              <text class="bit b2" x="302" y="148">1</text>
+            </g>
+
+            <!-- 键盘 -->
+            <g class="sc-keyboard">
+              <rect x="40" y="348" width="320" height="36" rx="10" fill="#E3EBF3" stroke="#2A2A28" stroke-width="4"/>
+              <g fill="#FFFDF6" stroke="#2A2A28" stroke-width="2.5">
+                <rect x="52" y="356" width="18" height="11" rx="3"/>
+                <rect x="83" y="356" width="18" height="11" rx="3"/>
+                <rect x="114" y="356" width="18" height="11" rx="3"/>
+                <rect x="145" y="356" width="18" height="11" rx="3"/>
+                <rect x="176" y="356" width="18" height="11" rx="3"/>
+                <rect x="207" y="356" width="18" height="11" rx="3"/>
+                <rect x="238" y="356" width="18" height="11" rx="3"/>
+                <rect x="269" y="356" width="18" height="11" rx="3"/>
+                <rect x="300" y="356" width="18" height="11" rx="3"/>
+                <rect x="331" y="356" width="17" height="11" rx="3"/>
+                <rect x="140" y="372" width="120" height="8" rx="3"/>
+              </g>
+            </g>
+
+            <!-- 支架 -->
+            <g class="sc-stand">
+              <rect x="184" y="318" width="32" height="16" fill="#FFFDF6" stroke="#2A2A28" stroke-width="4"/>
+              <rect x="152" y="332" width="96" height="8" rx="4" fill="#FFFDF6" stroke="#2A2A28" stroke-width="4"/>
+            </g>
+
+            <!-- 屏幕 -->
+            <g class="sc-monitor">
+              <rect x="92" y="164" width="216" height="154" rx="18" fill="#FFFDF6" stroke="#2A2A28" stroke-width="4"/>
+              <rect x="108" y="180" width="184" height="122" rx="10" fill="#FFF6D6" stroke="#2A2A28" stroke-width="3"/>
+            </g>
+
+            <!-- 屏幕上的表情 -->
+            <g class="sc-eyes" fill="#2A2A28">
+              <ellipse class="sc-eye" cx="166" cy="236" rx="6" ry="6.6"/>
+              <ellipse class="sc-eye" cx="234" cy="236" rx="6" ry="6.6"/>
+            </g>
+            <path class="sc-smile" d="M184 256q16 13 32 0" fill="none" stroke="#2A2A28" stroke-width="3.6" stroke-linecap="round"/>
+            <text x="200" y="294" text-anchor="middle" font-size="13" letter-spacing="5" fill="#9C9A90" opacity="0.75">0101</text>
+
+            <!-- 头上的豆苗 -->
+            <path class="sc-stem" pathLength="1" d="M200 164c0-22 0-32 0-44" fill="none" stroke="#3F7A34" stroke-width="7" stroke-linecap="round"/>
+            <path class="sc-leaf sc-leaf-l" d="M200 120c-40 0-70-28-72-64 38 0 68 28 72 64z" fill="#8FB86E" stroke="#3F7A34" stroke-width="4" stroke-linejoin="round"/>
+            <path class="sc-leaf sc-leaf-r" d="M200 120c40 0 70-28 72-64-38 0-68 28-72 64z" fill="#8FB86E" stroke="#3F7A34" stroke-width="4" stroke-linejoin="round"/>
+
+            <!-- 铅笔 -->
+            <g class="sc-pencil" stroke="#2A2A28" stroke-width="3.5" stroke-linejoin="round">
+              <rect x="21" y="228" width="18" height="84" rx="2" fill="#F2B705"/>
+              <path d="M21 312l9 16 9-16z" fill="#F7E2B0"/>
+              <path d="M25.5 321l4.5 7 4.5-7z" fill="#2A2A28" stroke="none"/>
+              <rect x="21" y="228" width="18" height="11" fill="#D94F3D"/>
+            </g>
+
+            <!-- 灯泡 -->
+            <g class="sc-bulb">
+              <path d="M352 68V28" stroke="#2A2A28" stroke-width="3.5" stroke-linecap="round"/>
+              <circle cx="352" cy="22" r="4" fill="none" stroke="#2A2A28" stroke-width="3"/>
+              <circle class="sc-glow" cx="352" cy="94" r="34" fill="#F2B705" opacity="0.16"/>
+              <circle cx="352" cy="94" r="22" fill="#FFF6D6" stroke="#2A2A28" stroke-width="3.5"/>
+              <path d="M345 101l5-8-2.5 5 6.5-4.5" fill="none" stroke="#D94F3D" stroke-width="3" stroke-linecap="round"/>
+              <rect x="343" y="114" width="18" height="10" rx="2" fill="#B9B5A8" stroke="#2A2A28" stroke-width="3"/>
+            </g>
+          </g>
+        </svg>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 实验一 ================= -->
+  <section class="page" id="exp1" data-page="exp1" aria-labelledby="exp1-h">
+    <div class="sheet">
+      <p class="kicker">实验一 · 4 关</p>
+      <h2 id="exp1-h">开关就是数字</h2>
+      <svg class="squiggle" viewBox="0 0 120 9" aria-hidden="true"><path pathLength="1" d="M2 6c14-5 30-5 44 0s30 5 44 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <p class="sub">计算机只会开和关。四个开关，就是四位<b>二进制</b>：每一位只能是 0 或 1。把亮着的位加起来，就得到一个数。</p>
+
+      <div class="goal" id="goal1" role="status" aria-live="polite">
+        <p class="goal__kick" id="goalKick">第 1 关 / 共 4 关</p>
+        <p class="goal__main" id="goalMain">凑出 <b>3</b></p>
+        <p class="goal__hint" id="goalHint"></p>
+      </div>
+
+      <div class="bulbs" role="group" aria-label="四位二进制开关，从左到右的位权是 8 4 2 1">
+        <button class="bulb" data-bit="8" aria-pressed="false"><span class="bulb__val">0</span><svg viewBox="0 0 24 34" aria-hidden="true"><path class="g" d="M12 2.5a9 9 0 0 0-5.1 16.4c.9.6 1.3 1.5 1.3 2.4h7.6c0-.9.4-1.8 1.3-2.4A9 9 0 0 0 12 2.5z"/><path class="f" d="M9.4 15.6l1.8-3-1 2.6 2.5-1.9"/><path class="b" d="M8.6 23.3h6.8M9.6 26.6h4.8"/></svg><b>8</b></button>
+        <button class="bulb" data-bit="4" aria-pressed="false"><span class="bulb__val">0</span><svg viewBox="0 0 24 34" aria-hidden="true"><path class="g" d="M12 2.5a9 9 0 0 0-5.1 16.4c.9.6 1.3 1.5 1.3 2.4h7.6c0-.9.4-1.8 1.3-2.4A9 9 0 0 0 12 2.5z"/><path class="f" d="M9.4 15.6l1.8-3-1 2.6 2.5-1.9"/><path class="b" d="M8.6 23.3h6.8M9.6 26.6h4.8"/></svg><b>4</b></button>
+        <button class="bulb" data-bit="2" aria-pressed="false"><span class="bulb__val">0</span><svg viewBox="0 0 24 34" aria-hidden="true"><path class="g" d="M12 2.5a9 9 0 0 0-5.1 16.4c.9.6 1.3 1.5 1.3 2.4h7.6c0-.9.4-1.8 1.3-2.4A9 9 0 0 0 12 2.5z"/><path class="f" d="M9.4 15.6l1.8-3-1 2.6 2.5-1.9"/><path class="b" d="M8.6 23.3h6.8M9.6 26.6h4.8"/></svg><b>2</b></button>
+        <button class="bulb" data-bit="1" aria-pressed="false"><span class="bulb__val">0</span><svg viewBox="0 0 24 34" aria-hidden="true"><path class="g" d="M12 2.5a9 9 0 0 0-5.1 16.4c.9.6 1.3 1.5 1.3 2.4h7.6c0-.9.4-1.8 1.3-2.4A9 9 0 0 0 12 2.5z"/><path class="f" d="M9.4 15.6l1.8-3-1 2.6 2.5-1.9"/><path class="b" d="M8.6 23.3h6.8M9.6 26.6h4.8"/></svg><b>1</b></button>
+      </div>
+
+      <p class="eq" aria-live="polite">
+        <span class="eq__terms" id="eqTerms"><i>0</i>×8 + <i>0</i>×4 + <i>0</i>×2 + <i>0</i>×1</span>
+        <span class="eq__sum">= <b id="sum">0</b></span>
+      </p>
+
+      <div class="tasks">
+        
+        <ol class="tasklist" id="tasklist1">
+          <li data-goal="3" data-exact="2"><span class="tick" aria-hidden="true"></span><span>凑出 <b>3</b></span></li>
+          <li data-goal="15"><span class="tick" aria-hidden="true"></span><span>凑出 <b>15</b></span></li>
+          <li data-goal="12"><span class="tick" aria-hidden="true"></span><span>凑出 <b>12</b></span></li>
+          <li data-goal="9"><span class="tick" aria-hidden="true"></span><span>凑出 <b>9</b></span></li>
+        </ol>
+      </div>
+
+      <div class="finding" id="find1" hidden>
+        <svg class="done-badge" aria-hidden="true"><use href="#sprout-mini"/></svg>
+        <p><b>你发现了：</b>四个开关的值是 1、2、4、8，每往左一位就翻一倍。你拨出来的这四位<b>二进制</b>，能拼出 0 到 15 之间的每一个数。计算机把八个开关绑成一组，叫一个字节，能表示 0 到 255。</p>
+      </div>
+
+      <nav class="pager">
+        <button class="btn" data-go="cover">← 回到封面</button>
+        <button class="btn btn--next" data-go="exp2" data-need="1" disabled>下一个：AI 认猫 →</button>
+      </nav>
+      <p class="lockhint" id="hint1">还有 4 关没做完，先做完再走。</p>
+    </div>
+  </section>
+
+  <!-- ================= 实验二 ================= -->
+  <section class="page" id="exp2" data-page="exp2" aria-labelledby="exp2-h">
+    <div class="sheet">
+      <p class="kicker">实验二 · 1 个互动 + 4 道题</p>
+      <h2 id="exp2-h">AI 是怎么认出猫的</h2>
+      <svg class="squiggle" viewBox="0 0 120 9" aria-hidden="true"><path pathLength="1" d="M2 6c14-5 30-5 44 0s30 5 44 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <p class="sub">你一眼就认出这是猫。AI 不会看，它只会数线索。先让 AI 看一遍，再回答四道题。</p>
+
+      <p class="callout" id="callout2">第 1 步 · 把四个线索都勾上</p>
+
+      <div class="catlayout">
+        <div class="cat">
+          <svg viewBox="0 0 320 250" role="img" aria-label="一只简笔画的猫">
+            <g fill="#FFFDF6" stroke="#2A2A28" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+              <path id="p-tail" class="cat__tail" d="M234 198c34 4 50-16 44-40-3-13-12-20-22-21" fill="none"/>
+              <ellipse cx="160" cy="188" rx="72" ry="42"/>
+              <path d="M132 212v10M188 212v10" fill="none"/>
+              <path id="p-ear-l" class="cat__ear" d="M118 92L100 32l54 38z"/>
+              <path id="p-ear-r" class="cat__ear" d="M202 92L220 32l-54 38z"/>
+              <path d="M120 84L107 41l39 27zM200 84l13-43-39 27z" fill="#F3C9C3" stroke-width="3"/>
+              <circle cx="160" cy="108" r="50"/>
+            </g>
+            <path d="M130 152q30 16 60 0" fill="none" stroke="#D94F3D" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="160" cy="166" r="7" fill="#F2B705" stroke="#2A2A28" stroke-width="3"/>
+            <g id="p-eyes" class="cat__eyes" fill="#2A2A28">
+              <ellipse class="cat__eye" cx="142" cy="102" rx="6" ry="7"/>
+              <ellipse class="cat__eye" cx="178" cy="102" rx="6" ry="7"/>
+            </g>
+            <path d="M152 60q8 7 16 0" fill="none" stroke="#2A2A28" stroke-width="4" stroke-linecap="round"/>
+            <path d="M160 118l-7 8h14z" fill="#2A2A28"/>
+            <path d="M160 126v7M160 133q-9 8-16 2M160 133q9 8 16 2" fill="none" stroke="#2A2A28" stroke-width="4" stroke-linecap="round"/>
+            <g id="p-whiskers" stroke="#2A2A28" stroke-width="4" stroke-linecap="round">
+              <path d="M124 120l-42-8M124 130l-44 4M126 140l-40 16"/>
+              <path d="M196 120l42-8M196 130l44 4M194 140l40 16"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="feats">
+          <p class="feats__title">让 AI 看见哪些线索？</p>
+          <label class="feat"><input type="checkbox" id="f-ears"><span class="feat__box" aria-hidden="true"></span><span>耳朵尖尖的</span></label>
+          <label class="feat"><input type="checkbox" id="f-whiskers"><span class="feat__box" aria-hidden="true"></span><span>脸上有胡须</span></label>
+          <label class="feat"><input type="checkbox" id="f-eyes"><span class="feat__box" aria-hidden="true"></span><span>两只眼睛</span></label>
+          <label class="feat"><input type="checkbox" id="f-tail"><span class="feat__box" aria-hidden="true"></span><span>一条长尾巴</span></label>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <p class="verdict__say">AI 说：<b id="aiSay">我不确定这是什么</b></p>
+        <div class="conf" role="img" aria-label="AI 的把握程度"><div class="conf__fill" id="confFill"></div></div>
+        <p class="conf__num" id="confNum">把握 8%</p>
+      </div>
+
+      <div class="quiz">
+        <p class="steplabel">第 2 步 · 四道题（答错能重选）</p>
+
+        <div class="q" data-answer="1">
+          <p class="q__ask"><b>1.</b> AI 说「是猫，把握 96%」。它一定是猫吗？</p>
+          <div class="q__opts">
+            <button class="opt" data-pick="0">一定是，96% 已经很高了</button>
+            <button class="opt" data-pick="1">不一定，它只是数到四条线索</button>
+          </div>
+          <p class="q__fb" aria-live="polite"></p>
+        </div>
+
+        <div class="q" data-answer="0">
+          <p class="q__ask"><b>2.</b> 只把一只猫的耳朵露给 AI 看，它会怎样？</p>
+          <div class="q__opts">
+            <button class="opt" data-pick="0">很可能认不出来</button>
+            <button class="opt" data-pick="1">照样认得出，它很聪明</button>
+          </div>
+          <p class="q__fb" aria-live="polite"></p>
+        </div>
+
+        <div class="q" data-answer="1">
+          <p class="q__ask"><b>3.</b> 它认得你家那只猫，就认得所有的猫吗？</p>
+          <div class="q__opts">
+            <button class="opt" data-pick="0">认得，猫不就是猫</button>
+            <button class="opt" data-pick="1">不一定，换个样子它可能就懵了</button>
+          </div>
+          <p class="q__fb" aria-live="polite"></p>
+        </div>
+
+        <div class="q" data-answer="2">
+          <p class="q__ask"><b>4.</b> 它认错了，最可能是什么原因？</p>
+          <div class="q__opts">
+            <button class="opt" data-pick="0">它故意骗人</button>
+            <button class="opt" data-pick="1">它坏了</button>
+            <button class="opt" data-pick="2">线索不够，或者它没见过这种东西</button>
+          </div>
+          <p class="q__fb" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="finding" id="find2" hidden>
+        <svg class="done-badge" aria-hidden="true"><use href="#sprout-mini"/></svg>
+        <p><b>你发现了：</b>AI 不会「看见」猫，它只是在数像猫的线索。线索越少，它越不敢肯定；它答错了，多半是线索的问题，不是它笨。</p>
+      </div>
+
+      <nav class="pager">
+        <button class="btn" data-go="exp1">← 上一个</button>
+        <button class="btn btn--next" data-go="exp3" data-need="1" disabled>下一个：能信吗 →</button>
+      </nav>
+      <p class="lockhint" id="hint2">还有 5 步没做完。</p>
+    </div>
+  </section>
+
+  <!-- ================= 实验三 ================= -->
+  <section class="page" id="exp3" data-page="exp3" aria-labelledby="exp3-h">
+    <div class="sheet">
+      <p class="kicker">实验三 · 5 封信</p>
+      <h2 id="exp3-h">这封信能信吗</h2>
+      <svg class="squiggle" viewBox="0 0 120 9" aria-hidden="true"><path pathLength="1" d="M2 6c14-5 30-5 44 0s30 5 44 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <p class="sub">五封信，有真有假。选错了不要紧，可以再选一次。</p>
+
+      <div class="letters" id="letters">
+        <article class="letter" data-answer="no" data-why="天上不会掉红包。一开口就要你点陌生链接的，多半是骗人的。">
+          <p class="letter__body">恭喜您被抽中一等奖！点击链接领取 666 元红包，名额只剩 3 个。</p>
+          <p class="letter__from">—— 陌生短信</p>
+          <div class="letter__ask">
+            <button class="btn btn--sm" data-pick="no">不能信</button>
+            <button class="btn btn--sm" data-pick="yes">能信</button>
+          </div>
+          <p class="letter__why" aria-live="polite"></p>
+        </article>
+
+        <article class="letter" data-answer="yes" data-why="没有要钱，没有要密码，也没有让你点链接。而且是你认识的人。">
+          <p class="letter__body">妈妈：今天要加班，你自己先吃饭，别等我。</p>
+          <p class="letter__from">—— 妈妈发来的微信</p>
+          <div class="letter__ask">
+            <button class="btn btn--sm" data-pick="no">不能信</button>
+            <button class="btn btn--sm" data-pick="yes">能信</button>
+          </div>
+          <p class="letter__why" aria-live="polite"></p>
+        </article>
+
+        <article class="letter" data-answer="no" data-why="没有人需要你的密码，除了你自己。真正的客服永远不会问。">
+          <p class="letter__body">我是游戏客服，你的账号被冻结了。把密码发给我，我帮你解封。</p>
+          <p class="letter__from">—— 陌生私信</p>
+          <div class="letter__ask">
+            <button class="btn btn--sm" data-pick="no">不能信</button>
+            <button class="btn btn--sm" data-pick="yes">能信</button>
+          </div>
+          <p class="letter__why" aria-live="polite"></p>
+        </article>
+
+        <article class="letter" data-answer="no" data-why="图书馆不会让你点陌生链接交罚款。要确认，就去学校图书馆官网，或者直接问老师。">
+          <p class="letter__body">同学你好，你借的书已经超期，请点这个链接交 5 元罚款，否则影响毕业。</p>
+          <p class="letter__from">—— 陌生短信，说自己是图书馆</p>
+          <div class="letter__ask">
+            <button class="btn btn--sm" data-pick="no">不能信</button>
+            <button class="btn btn--sm" data-pick="yes">能信</button>
+          </div>
+          <p class="letter__why" aria-live="polite"></p>
+        </article>
+
+        <article class="letter" data-answer="yes" data-why="没有链接，没有密码，没有要钱。是你认识的人，说的是明天要带的东西。">
+          <p class="letter__body">爸爸：明天记得把数学本带上，老师要检查。</p>
+          <p class="letter__from">—— 爸爸发来的微信</p>
+          <div class="letter__ask">
+            <button class="btn btn--sm" data-pick="no">不能信</button>
+            <button class="btn btn--sm" data-pick="yes">能信</button>
+          </div>
+          <p class="letter__why" aria-live="polite"></p>
+        </article>
+      </div>
+
+      <div class="finding" id="find3" hidden>
+        <svg class="done-badge" aria-hidden="true"><use href="#sprout-mini"/></svg>
+        <p><b>记住三句话：</b>他要我点链接吗？要我给钱或密码吗？这人我不认识吗？只要有一个「是」，就先停一停。</p>
+      </div>
+
+      <nav class="pager">
+        <button class="btn" data-go="exp2">← 上一个</button>
+        <button class="btn btn--next" data-go="cert" data-need="1" disabled>去领毕业证 →</button>
+      </nav>
+      <p class="lockhint" id="hint3">还有 5 封信没判断。</p>
+    </div>
+  </section>
+
+  <!-- ================= 毕业证 ================= -->
+  <section class="page" id="cert" data-page="cert" aria-labelledby="cert-h">
+    <div class="sheet sheet--cert">
+      <p class="kicker">毕业证明</p>
+      <h2 id="cert-h">豆苗实验室 · 结业证明</h2>
+      <svg class="squiggle" viewBox="0 0 120 9" aria-hidden="true"><path pathLength="1" d="M2 6c14-5 30-5 44 0s30 5 44 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <p class="sub">三个实验都做完了，才拿得到这张证。</p>
+
+      <div class="cert-card">
+        <p class="cert__line">兹证明 <input class="cert__name" id="certName" type="text" placeholder="写上你的名字" maxlength="12" aria-label="你的名字"> 同学，</p>
+        <p class="cert__line">在豆苗实验室完成了以下实验：</p>
+        <ul class="cert__list">
+          <li data-key="exp1" data-done="0"><span class="cert__tick" aria-hidden="true"></span> 开关就是数字（4 关）</li>
+          <li data-key="exp2" data-done="0"><span class="cert__tick" aria-hidden="true"></span> AI 是怎么认出猫的（4 道题）</li>
+          <li data-key="exp3" data-done="0"><span class="cert__tick" aria-hidden="true"></span> 这封信能信吗（5 封信）</li>
+        </ul>
+        <p class="cert__line">并且记住了三件事：陌生链接不点，密码和钱不给，不认识的人说什么都先停一停。</p>
+        <p class="cert__date" id="certDate"></p>
+        <div class="cert__stamp" aria-hidden="true">豆苗<br>实验室</div>
+      </div>
+
+      <div class="cert__acts">
+        <button class="btn btn--big" id="saveBtn">保存这张证书</button>
+        <button class="btn" id="restartBtn">再做一遍</button>
+      </div>
+      
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <p>河海大学计算机与软件学院 ·「豆苗逐智·童享科技」公益科普志愿项目</p>
+  <p>本页可离线使用，自由用于社区与小学课堂。</p>
+</footer>
+
+<div class="intro" id="intro">
+  <div class="intro__bubble" id="introBubble"><b>欢迎来到豆苗实验室！</b>让我们来认识计算机。</div>
+  <div class="intro__char" id="introChar"><svg viewBox="0 0 80 86" aria-hidden="true"><use href="#pet-char"/></svg></div>
+</div>
+
+<div class="pet is-hidden" id="pet">
+  <div class="pet__bubble" id="petBubble" hidden></div>
+  <div class="pet__panel" id="petPanel" hidden>
+    <p class="pet__say" id="petSay">要我帮点什么？</p>
+    <div class="pet__acts">
+      <button class="pet__act" id="petHint" type="button">给我个提示</button>
+      <button class="pet__act" id="petChat" type="button">随便聊聊</button>
+    </div>
+    <button class="pet__close" id="petClose" type="button" aria-label="收起小豆苗">×</button>
+  </div>
+  <button class="pet__btn" id="petBtn" type="button" aria-expanded="false" aria-controls="petPanel" aria-label="摸摸小豆苗">
+    <span class="pet__tip" id="petTip" aria-hidden="true" hidden>摸摸我</span>
+    <svg class="pet__art" viewBox="0 0 80 86" aria-hidden="true"><use href="#pet-char"/></svg>
+  </button>
+</div>
+
+<script>
+/* 豆苗实验室 · main.js
+ *
+ * 三个实验的交互都在这个文件里。没有依赖、没有构建步骤，
+ * 改完直接刷新就能看到效果。
+ *
+ * 进度只存在内存里：刷新页面等于从头再来。这样孩子拿去玩不会
+ * 留下半截状态，也省得处理 localStorage 在 file:// 下的各种毛病。
+ */
+
+(function () {
+  'use strict';
+
+  // 没有 JS 时所有页会顺序铺开（见 main.css 里的 .no-js 规则）；
+  // 脚本能跑了就把这个 class 摘掉，切成一次只显示一页
+  document.documentElement.classList.remove('no-js');
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  // 三个实验各自的完成标记，决定解锁什么、毕业证打几个勾
+  var done = { exp1: false, exp2: false, exp3: false };
+
+  var FINDING = { exp1: 'find1', exp2: 'find2', exp3: 'find3' };
+
+
+  // ---------------------------------------------------------------
+  // 路由 + 解锁
+  // ---------------------------------------------------------------
+
+  function canEnter(id) {
+    switch (id) {
+      case 'exp2': return done.exp1;
+      case 'exp3': return done.exp2;
+      case 'cert': return done.exp3;
+      default:     return true;
+    }
+  }
+
+  var LOCK_MSG = {
+    exp2: '先做完实验一的 4 关，实验二才会开。',
+    exp3: '先把实验二的线索和题目都做完，实验三才会开。',
+    cert: '三个实验都做完，才能领毕业证。'
+  };
+
+  var toastTimer = 0;
+
+  function toast(msg) {
+    var el = $('#toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('is-on'); }, 2800);
+  }
+
+  function go(id, quiet) {
+    var page = document.getElementById(id);
+    if (!page || !page.classList.contains('page')) return false;
+
+    if (!canEnter(id)) {
+      toast(LOCK_MSG[id] || '这一页还没开。');
+      return false;
+    }
+
+    $$('.page').forEach(function (p) { p.classList.toggle('is-on', p === page); });
+    $$('.tab').forEach(function (t) {
+      t.setAttribute('aria-current', t.dataset.go === id ? 'true' : 'false');
+    });
+
+    // 带 #exp1 直接打开时浏览器会自己跳锚点，把标题顶到吸顶导航下面，
+    // 所以下一帧再压一次
+    window.scrollTo(0, 0);
+    requestAnimationFrame(function () { window.scrollTo(0, 0); });
+
+    try { history.replaceState(null, '', '#' + id); } catch (e) { /* file:// 下可能不让改 */ }
+
+    var h = page.querySelector('h1, h2');
+    if (h && !quiet) {
+      h.setAttribute('tabindex', '-1');
+      h.focus({ preventScroll: true });
+    }
+    return true;
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-go]');
+    if (!el) return;
+    e.preventDefault();
+    go(el.dataset.go);
+  });
+
+  var tabBar = $('.tabs');
+  if (tabBar) {
+    tabBar.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var tabs = $$('.tab');
+      var i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length].focus();
+    });
+  }
+
+
+// ---------------------------------------------------------------
+  // 实验一：四位二进制，四关
+  // 每个开关上面写它当前是 0 还是 1，下面写它的位权，
+  // 底下一行实时算式把"怎么加出来的"摊开，不让人猜。
+  // ---------------------------------------------------------------
+
+  var bulbs = $$('.bulb');
+  var sumOut = $('#sum');
+  var eqTerms = $('#eqTerms');
+  var taskList = $('#tasklist1');
+  var goalBox = $('#goal1');
+  var goalKick = $('#goalKick');
+  var goalMain = $('#goalMain');
+  var goalHint = $('#goalHint');
+
+  var GOAL_HINT = {};
+
+  var resetTimer = 0;
+  var lastSum = -1;
+  var lastGoalKey = '';
+
+  function taskItems() { return taskList ? $$('li', taskList) : []; }
+
+  // 让某个元素抖一下。先移除再加回，否则连续两次同样的变化不会重播
+  function bump(el) {
+    if (!el) return;
+    el.classList.remove('is-bump');
+    void el.offsetWidth;
+    el.classList.add('is-bump');
+  }
+
+  function renderBits() {
+    var total = 0;
+    var lit = 0;
+    var parts = [];
+
+    bulbs.forEach(function (b) {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      var weight = Number(b.dataset.bit);
+
+      if (on) { total += weight; lit++; }
+
+      b.querySelector('.bulb__val').textContent = on ? '1' : '0';
+      parts.push('<i class="' + (on ? 'on' : '') + '">' + (on ? 1 : 0) + '</i>×' + weight);
+    });
+
+    eqTerms.innerHTML = parts.join(' + ');
+
+    if (total !== lastSum) {
+      lastSum = total;
+      sumOut.textContent = total;
+      bump(sumOut);
+    }
+
+    // 顺手看看有没有刚好凑中某一关
+    var justDone = null;
+    taskItems().forEach(function (li) {
+      if (li.classList.contains('is-done')) return;
+      // 只认第一道没做完的：乱拨出来的数不能点亮后面的关卡
+      var firstOpen = taskItems().filter(function (x) { return !x.classList.contains('is-done'); })[0];
+      if (li !== firstOpen) return;
+      var goal = Number(li.dataset.goal);
+      var needLit = li.dataset.exact ? Number(li.dataset.exact) : null;
+
+      if (total === goal && (needLit === null || lit === needLit)) {
+        li.classList.add('is-done');
+        justDone = li;
+      }
+    });
+
+    updateGoal();
+    refresh();
+
+    // 过关之后自动把开关清空，省得孩子自己一个个点灭
+    if (justDone) {
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () {
+        var allDone = taskItems().every(function (li) { return li.classList.contains('is-done'); });
+        if (allDone) return;
+        bulbs.forEach(function (b) {
+          if (b.getAttribute('aria-pressed') === 'true') b.click();
+        });
+      }, 950);
+    }
+  }
+
+  function updateGoal() {
+    if (!goalBox) return;
+
+    var items = taskItems();
+    var undone = items.filter(function (li) { return !li.classList.contains('is-done'); });
+
+    // 换了关才动 DOM；不然每次拨开关都会重写一遍，读屏软件会一直念
+    var key = undone.length ? 'goal-' + undone[0].dataset.goal : 'all';
+    if (key === lastGoalKey) return;
+    lastGoalKey = key;
+
+    if (!undone.length) {
+      goalBox.classList.add('is-all');
+      var tasksBox = $('.tasks');
+      if (tasksBox) tasksBox.classList.add('is-all');
+      goalKick.textContent = '四关都过了';
+      goalMain.textContent = '全部完成';
+      goalHint.textContent = '往下看看你发现了什么';
+      // 四关都过了，这一页才算完成
+      completeModule('exp1');
+      return;
+    }
+
+    var li = undone[0];
+    var n = items.indexOf(li) + 1;
+
+    goalKick.textContent = '第 ' + n + ' 关 / 共 ' + items.length + ' 关';
+    goalMain.innerHTML = '凑出 <b>' + li.dataset.goal + '</b>';
+    goalHint.textContent = GOAL_HINT[li.dataset.goal] || '';
+
+    bump(goalBox);
+  }
+
+  bulbs.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', on ? 'false' : 'true');
+      renderBits();
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // 实验二：四个特征 + 四道题
+  // ---------------------------------------------------------------
+
+  var FEATS = [
+    ['f-ears', ['p-ear-l', 'p-ear-r']],
+    ['f-whiskers', ['p-whiskers']],
+    ['f-eyes', ['p-eyes']],
+    ['f-tail', ['p-tail']]
+  ];
+
+  var CONF = [8, 26, 58, 84, 96];
+  var SAY = ['我不确定这是什么', '有点眼熟，但不敢说', '有点像猫', '应该是猫吧', '是猫！'];
+
+  var confFill = $('#confFill');
+  var confNum = $('#confNum');
+  var aiSay = $('#aiSay');
+  var callout2 = $('#callout2');
+
+  var featsDone = false;   // 四个特征至少勾齐过一次
+    // 线索没勾满之前，题目先藏起来
+    var quizEl = document.querySelector('.quiz');
+    if (quizEl) quizEl.classList.toggle('is-ready', featsDone);
+  var qs = $$('.q');
+  var solved = 0;
+
+  // 每道题答对之后补一句解释，写在数据里太散，索性放这儿
+  var WHY = [
+    '96% 只是它的把握，不是事实。它没见过的东西，它也会给个高分。',
+    '线索太少，它就不敢肯定了。人只看到一只耳朵也知道是猫，它不行。',
+    '长得不一样的猫，它可能一次都没见过，自然认不出来。',
+    '多半是线索不够，或者它根本没学过这种东西。'
+  ];
+
+  function renderCat() {
+    var n = 0;
+
+    FEATS.forEach(function (pair) {
+      var box = document.getElementById(pair[0]);
+      var checked = box ? box.checked : false;
+
+      if (checked) n++;
+
+      pair[1].forEach(function (pid) {
+        var el = document.getElementById(pid);
+        if (!el) return;
+        el.classList.toggle('on', checked);
+
+        // 勾耳朵的时候让它抖一下，像刚听见声音
+        if (checked && el.classList.contains('cat__ear')) {
+          el.classList.remove('twitch');
+          void el.offsetWidth;
+          el.classList.add('twitch');
+        }
+      });
+    });
+
+    confFill.style.width = CONF[n] + '%';
+    if (confNum.textContent !== '把握 ' + CONF[n] + '%') {
+      confNum.textContent = '把握 ' + CONF[n] + '%';
+      bump(confNum);
+    }
+    aiSay.textContent = SAY[n];
+
+    // 这一步"算不算完成"要看当下：取消勾选就是退回到第一步，
+    // 大字得重新放大回来，不能勾过一次就永远收着
+    featsDone = (n === 4);
+
+    if (callout2) {
+      // 整个实验已经通过了，就让它一直收着；否则跟着勾选状态走
+      callout2.classList.toggle('is-done', n === 4 || done.exp2);
+    }
+
+    tryFinish2();
+    refresh();
+  }
+
+  FEATS.forEach(function (pair) {
+    var box = document.getElementById(pair[0]);
+    if (box) box.addEventListener('change', renderCat);
+  });
+
+  qs.forEach(function (q, qi) {
+    var answer = Number(q.dataset.answer);
+    var fb = $('.q__fb', q);
+
+    $$('.opt', q).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (q.classList.contains('is-right')) return;
+
+        if (Number(btn.dataset.pick) === answer) {
+          q.classList.add('is-right');
+          btn.classList.add('is-picked');
+          $$('.opt', q).forEach(function (b) { b.disabled = true; });
+
+          fb.textContent = '答对了。' + (WHY[qi] || '');
+          fb.className = 'q__fb is-ok';
+
+          solved++;
+          tryFinish2();
+          refresh();
+        } else {
+          btn.classList.add('is-wrong');
+          fb.textContent = '再想想，这个不对。';
+          fb.className = 'q__fb is-bad';
+          setTimeout(function () { btn.classList.remove('is-wrong'); }, 600);
+        }
+      });
+    });
+  });
+
+  function tryFinish2() {
+    if (featsDone && solved === qs.length) completeModule('exp2');
+  }
+
+
+  // ---------------------------------------------------------------
+  // 实验三：五封信
+  // ---------------------------------------------------------------
+
+  // 答错时把判断方法摊开，再点出这封信的可疑之处
+  // 五封信各一句，顺序和页面上一致：红包 / 妈妈 / 客服 / 图书馆 / 爸爸
+  var LETTER_HINT = [
+    '要你点一个没见过的链接去领 666 元红包。天上不会掉钱。',
+    '没有链接、没有要钱、没有要密码，发信的确实是你妈妈——三问都答「不」。',
+    '它自称「游戏客服」，却要你把密码发过去。没有人需要你的密码。',
+    '它让你点链接交罚款，还用「影响毕业」吓你。真罚款不会这样催。',
+    '只是提醒你带数学本，没有链接、没有钱、没有密码，是你爸爸。'
+  ];
+
+  var letters = $$('.letter');
+
+  letters.forEach(function (card) {
+    var answer = card.dataset.answer;
+    var fb = $('.letter__why', card);
+
+    $$('[data-pick]', card).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (card.classList.contains('is-right')) return;
+
+        if (btn.dataset.pick === answer) {
+          card.classList.remove('is-wrong');
+          card.classList.add('is-right');
+
+          fb.textContent = '答对了。' + card.dataset.why;
+          $$('[data-pick]', card).forEach(function (b) {
+            b.disabled = true;
+            b.classList.remove('is-wrong');
+          });
+
+          if ($$('.letter.is-right').length === letters.length) completeModule('exp3');
+          refresh();
+        } else {
+          btn.classList.add('is-wrong');
+          card.classList.remove('is-wrong');
+          void card.offsetWidth;
+          card.classList.add('is-wrong');
+
+            fb.innerHTML = '<b>这封不是。</b>'
+              + '<span class="letter__tip">' + (LETTER_HINT[letters.indexOf(card)] || '再读一遍，找找有没有链接、钱、密码。') + '</span>';
+
+          setTimeout(function () { btn.classList.remove('is-wrong'); }, 700);
+        }
+      });
+    });
+  });
+
+
+  // ---------------------------------------------------------------
+  // 收尾：完成一个模块之后统一刷新界面
+  // ---------------------------------------------------------------
+
+  // 让宠物蹦一下；找不到元素就安静地什么都不做
+  function happyHop() {
+    var pet = $('#pet');
+    if (!pet) return;
+    pet.classList.remove('is-happy');
+    void pet.offsetWidth;
+    pet.classList.add('is-happy');
+    setTimeout(function () { pet.classList.remove('is-happy'); }, 900);
+  }
+
+  function completeModule(key) {
+    if (done[key]) return;
+    done[key] = true;
+
+    refresh();
+    happyHop();
+
+    var el = document.getElementById(FINDING[key]);
+    if (!el) return;
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+  }
+
+  function setHint(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function refresh() {
+    $$('.tab').forEach(function (t) {
+      if (canEnter(t.dataset.go)) t.removeAttribute('data-locked');
+      else t.setAttribute('data-locked', '1');
+    });
+
+    Object.keys(FINDING).forEach(function (k) {
+      var el = document.getElementById(FINDING[k]);
+      if (el) el.hidden = !done[k];
+    });
+
+    Object.keys(done).forEach(function (k) {
+      var btn = $('#' + k + ' .btn--next');
+      if (btn) btn.disabled = !done[k];
+
+      var hint = $('#' + k + ' .lockhint');
+      if (hint) hint.classList.toggle('is-off', done[k]);
+    });
+
+    var left1 = taskItems().filter(function (li) { return !li.classList.contains('is-done'); }).length;
+    if (!done.exp1) setHint('hint1', '还有 ' + left1 + ' 关没做完，先做完再走。');
+
+    var left2 = (featsDone ? 0 : 1) + (qs.length - solved);
+    if (!done.exp2) setHint('hint2', '还有 ' + left2 + ' 步没做完。');
+
+    var left3 = letters.length - $$('.letter.is-right').length;
+    if (!done.exp3) setHint('hint3', '还有 ' + left3 + ' 封信没判断。');
+
+    $$('.cert__list li').forEach(function (li) {
+      li.dataset.done = done[li.dataset.key] ? '1' : '0';
+    });
+  }
+
+
+  // ---------------------------------------------------------------
+  // 毕业证
+  // ---------------------------------------------------------------
+
+  var certDate = $('#certDate');
+  if (certDate) {
+    var d = new Date();
+    certDate.textContent = d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+  }
+
+  var saveBtn = $('#saveBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function () {
+      // 浏览器把页面标题当成另存 PDF 时的默认文件名，所以先临时换一个好认的
+      var oldTitle = document.title;
+      var nameEl = $('#certName');
+      var who = nameEl ? (nameEl.value || '').trim() : '';
+
+      document.title = '豆苗实验室-结业证明' + (who ? '-' + who : '');
+
+      try {
+        window.print();
+      } finally {
+        // 打印/另存窗口关掉之后把标题还原
+        setTimeout(function () { document.title = oldTitle; }, 800);
+      }
+    });
+  }
+
+  var restartBtn = $('#restartBtn');
+  if (restartBtn) {
+    // 直接重载最省事，也不用一个个把状态清回去
+    restartBtn.addEventListener('click', function () { location.reload(); });
+  }
+
+
+// ---------------------------------------------------------------
+  // 常驻的小豆苗：能拖、会自己溜达、点一下能互动
+  // ---------------------------------------------------------------
+
+  var pet = $('#pet');
+  var petBtn2 = $('#petBtn');
+  var petPanel = $('#petPanel');
+  var petSay = $('#petSay');
+  var petHint = $('#petHint');
+  var petChat = $('#petChat');
+  var petClose = $('#petClose');
+  var petTip = $('#petTip');
+  var petBubble = $('#petBubble');
+
+  // 闲聊用的句子，都挑具体的说，不要空话
+  var CHATS = [
+    '计算机里，一个 0 或一个 1，叫一个「位」。',
+    '八个位绑在一起，叫一个「字节」，能表示 0 到 255。',
+    '你手机里一张照片，大概有几百万个字节。',
+    'AI 认东西，靠的是一条一条的线索，不是「看一眼就懂」。',
+    '你敲的每一个字，进了电脑都变成 0 和 1。',
+    '豆苗也是要晒太阳的——不过是你关机之后。'
+  ];
+
+  // 自己溜达时会嘀咕的句子
+  var IDLE_TALK = [
+    '今天也要做实验呀。',
+    '你在看哪一页？',
+    '我在这儿，有事叫我。',
+    '0 和 1，够用了。',
+    '站久了，腿有点麻。'
+  ];
+
+  var chatIndex = -1;
+  var petX = 0;
+  var petY = 0;
+  var dragging = false;
+  var dragMoved = false;
+  var dragStart = null;
+  var suppressClick = false;
+  var roamTimer = 0;
+  var talkTimer = 0;
+
+  function petSize() {
+    var r = pet.getBoundingClientRect();
+    return { w: r.width, h: r.height };
+  }
+
+  // 把位置夹在可视区里再写进 transform
+  function setPetPos(x, y, animate) {
+    var s = petSize();
+    var maxX = window.innerWidth - s.w - 8;
+    var maxY = window.innerHeight - s.h - 8;
+
+    petX = Math.min(Math.max(8, x), Math.max(8, maxX));
+    petY = Math.min(Math.max(8, y), Math.max(8, maxY));
+
+    pet.style.transition = animate ? 'transform 1.05s cubic-bezier(.16,1,.3,1)' : 'none';
+    pet.style.transform = 'translate(' + petX + 'px,' + petY + 'px)';
+  }
+
+  function placePet() {
+    var s = petSize();
+    setPetPos(window.innerWidth - s.w - 24, window.innerHeight - s.h - 24, false);
+  }
+
+  function currentPageId() {
+    var page = $('.page.is-on');
+    return page ? page.id : 'cover';
+  }
+
+  // 按当前进度算一句真正有用的提示
+  function currentHint() {
+    var id = currentPageId();
+
+    if (id === 'cover') return '先点「开始做实验」，从第一关开始。';
+
+    if (id === 'exp1') {
+      var left = taskItems().filter(function (li) { return !li.classList.contains('is-done'); });
+      if (!left.length) return '四关都过了，去实验二吧。';
+      var li = left[0];
+      var goal = li.dataset.goal;
+      var recipe = {
+        '3':  '只打开 1 和 2 这两个，加起来正好 3。',
+        '15': '四个全打开——8、4、2、1 一个不落，就是 15。',
+        '12': '打开 8 和 4，把 2 和 1 关上。',
+        '9':  '打开 8 和 1；中间那两位不用管。'
+      }[goal];
+      if (lastSum === 0) return '这一关要 ' + goal + '。' + recipe;
+      if (lastSum === Number(goal)) return '就是这个数！';
+      var diff = Number(goal) - lastSum;
+      if (diff > 0) return '现在是 ' + lastSum + '，离 ' + goal + ' 还差 ' + diff + '。' + recipe;
+      return '现在是 ' + lastSum + '，比 ' + goal + ' 多了 ' + (-diff) + '，关掉一个再试试。';
+    }
+
+    if (id === 'exp2') {
+      if (!featsDone) return '把耳朵、胡须、眼睛、尾巴四条线索都勾上，它会一条一条数给你看。';
+      if (solved < qs.length) {
+        // 题目能乱序点，提示要对准第一道还没答对的，不能拿"答对了几道"去推算
+        var qi2 = 0;
+        for (var k2 = 0; k2 < qs.length; k2++) {
+          if (!qs[k2].classList.contains('is-right')) { qi2 = k2; break; }
+        }
+        return '从第 ' + (qi2 + 1) + ' 题往下做，答错可以再选。';
+      }
+      return '这一页做完了，去实验三吧。';
+    }
+
+    if (id === 'exp3') {
+      var rest = letters.length - $$('.letter.is-right').length;
+      if (!rest) return '五封信都判完了，去领证书吧。';
+      // 指着第一封还没判的信说具体疑点，别讲空话
+      var all3 = $$('.letter');
+      var idx3 = -1;
+      for (var i3 = 0; i3 < all3.length; i3++) {
+        if (!all3[i3].classList.contains('is-right')) { idx3 = i3; break; }
+      }
+      if (idx3 < 0) return '五封都判完了，去领证书吧。';
+      return '第 ' + (idx3 + 1) + ' 封。先问三句：他要我点链接吗？要我给钱或密码吗？这人我不认识吗？';
+    }
+
+    if (id === 'cert') return '三个实验都过了。写上名字，就能保存这张证书。';
+
+    return '点上面的目录，可以换一个实验。';
+  }
+
+  // 头顶上冒一句小话，过几秒自己消失
+  function sayBubble(text) {
+    if (!petBubble) return;
+    petBubble.textContent = text;
+    petBubble.hidden = false;
+    petBubble.classList.add('is-on');
+    clearTimeout(talkTimer);
+    talkTimer = setTimeout(function () {
+      petBubble.classList.remove('is-on');
+      setTimeout(function () { petBubble.hidden = true; }, 220);
+    }, 2800);
+  }
+
+  var lastPetLine = '';
+
+  // 摸一下：蹦一下 + 说句俏皮话。不管气泡开没开，这一个动作都成立。
+  function petOnce() {
+    var lines = ['嘿嘿，好痒。', '我最喜欢晒太阳了。', '再摸一下嘛。', '你的手好暖和。'];
+    var next = Math.floor(Math.random() * lines.length);
+    // 别连着说同一句
+    if (lines[next] === lastPetLine) next = (next + 1) % lines.length;
+    lastPetLine = lines[next];
+    petSay.textContent = lastPetLine;
+    if (petTip) petTip.hidden = true;
+    happyHop();
+  }
+
+  function openPet() {
+    if (!petPanel) return;
+    if (petBubble) { petBubble.hidden = true; petBubble.classList.remove('is-on'); }
+
+    petPanel.hidden = false;
+
+    // 上面放不下就改成朝下开——绝不挪动宠物本身
+    pet.classList.toggle('is-below', petY < petPanel.offsetHeight + 16);
+
+    petBtn2.setAttribute('aria-expanded', 'true');
+    petOnce();
+    petHint.focus();
+  }
+
+  function closePet() {
+    if (!petPanel || petPanel.hidden) return;
+    petPanel.hidden = true;
+    petBtn2.setAttribute('aria-expanded', 'false');
+    petBtn2.focus();
+  }
+
+  // ---- 拖动 ----
+  if (pet && petBtn2) {
+    petBtn2.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true;
+      dragMoved = false;
+      dragStart = { x: e.clientX, y: e.clientY, ox: petX, oy: petY };
+      pet.classList.add('is-dragging');
+      try { petBtn2.setPointerCapture(e.pointerId); } catch (err) {}
+      clearTimeout(roamTimer);
+    });
+
+    petBtn2.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - dragStart.x;
+      var dy = e.clientY - dragStart.y;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) dragMoved = true;
+      if (!dragMoved) return;
+      setPetPos(dragStart.ox + dx, dragStart.oy + dy, false);
+    });
+
+    petBtn2.addEventListener('pointerup', function (e) {
+      if (!dragging) return;
+      dragging = false;
+      pet.classList.remove('is-dragging');
+      try { petBtn2.releasePointerCapture(e.pointerId); } catch (err) {}
+
+      if (dragMoved) {
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 400);
+        setPetPos(petX, petY, true);
+        scheduleRoam();
+      }
+    });
+
+    petBtn2.addEventListener('pointercancel', function () {
+      dragging = false;
+      pet.classList.remove('is-dragging');
+      scheduleRoam();
+    });
+  }
+
+  // ---- 点击（键盘 Enter/空格也走这里）----
+  if (petBtn2 && petPanel) {
+    petBtn2.addEventListener('click', function () {
+      if (suppressClick) { suppressClick = false; return; }
+      if (petPanel.hidden) openPet(); else petOnce();
+    });
+
+    petClose.addEventListener('click', closePet);
+
+    petHint.addEventListener('click', function () {
+      petSay.textContent = currentHint();
+    });
+
+    petChat.addEventListener('click', function () {
+      var next = Math.floor(Math.random() * CHATS.length);
+      if (next === chatIndex) next = (next + 1) % CHATS.length;
+      chatIndex = next;
+      petSay.textContent = CHATS[next];
+    });
+
+    document.addEventListener('click', function (e) {
+      if (petPanel.hidden) return;
+      if (e.target.closest('#pet')) return;
+      closePet();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closePet();
+    });
+  }
+
+  // ---- 自己溜达 ----
+  function canRoam() {
+    if (!pet) return false;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    return true;
+  }
+
+  function scheduleRoam() {
+    clearTimeout(roamTimer);
+    if (!canRoam()) return;
+    roamTimer = setTimeout(function () {
+      roamOnce();
+      scheduleRoam();
+    }, 5000 + Math.random() * 4500);
+  }
+
+  function roamOnce() {
+    // 正在拖、面板开着、或者页面在打印，就别乱动
+    if (dragging || (petPanel && !petPanel.hidden)) return;
+
+    var s = petSize();
+    var r = Math.random();
+
+    if (r < 0.5) {
+      // 横向挪一小段，像在走
+      var span = Math.min(200, window.innerWidth * 0.24);
+      var nx = petX + (Math.random() * 2 - 1) * span;
+      pet.classList.add('is-walking');
+      setPetPos(nx, petY, true);
+      setTimeout(function () { pet.classList.remove('is-walking'); }, 1100);
+    } else if (r < 0.7) {
+      // 蹦一下
+      pet.classList.add('is-happy');
+      setTimeout(function () { pet.classList.remove('is-happy'); }, 900);
+    } else if (r < 0.85) {
+      // 左右张望
+      pet.classList.toggle('is-flip');
+    } else {
+      // 自言自语
+      sayBubble(IDLE_TALK[Math.floor(Math.random() * IDLE_TALK.length)]);
+    }
+  }
+
+  window.addEventListener('resize', function () {
+    if (!pet) return;
+    setPetPos(petX, petY, false);
+  });
+
+  // 页面滚动时先淡下去，别挡着正文；停下来再亮回来
+  var dimTimer = 0;
+  window.addEventListener('scroll', function () {
+    if (!pet || dragging) return;
+    pet.classList.add('is-dim');
+    clearTimeout(dimTimer);
+    dimTimer = setTimeout(function () { pet.classList.remove('is-dim'); }, 650);
+  }, { passive: true });
+
+
+  // 「摸摸我」不是常驻标签：人一直不动，它才冒出来招呼一声；
+  // 一旦有操作就收起来，之后靠自言自语自己热闹。
+  var IDLE_MS = 12000;
+  var idleTimer = 0;
+
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    if (petTip) petTip.hidden = true;
+    idleTimer = setTimeout(function () {
+      if (!pet || dragging || (petPanel && !petPanel.hidden)) return;
+      if (petTip) petTip.hidden = false;
+    }, IDLE_MS);
+  }
+
+  ['pointerdown', 'pointermove', 'wheel', 'keydown', 'scroll'].forEach(function (name) {
+    window.addEventListener(name, resetIdle, { passive: true });
+  });
+
+
+  // 开场：封面那台电脑先说话，停五秒，再顺滑飞进右下角变成桌宠。
+  // 带 ?nointro 参数或系统关了动效时不播，免得影响截图和测试。
+  // 手机端：封面插画在首屏外，改用居中角色演同一套
+  function runIntroSmall(intro, char, bubble) {
+    var t = petBtn2.getBoundingClientRect();
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    var w = Math.min(W * 0.6, 230);
+    var sc = w / 240;
+    var sx = (W - w) / 2;
+    var sy = H * 0.3;
+
+    char.style.display = 'block';
+    intro.hidden = false;
+    intro.style.opacity = '';   // 遮罩从首帧就在，不要再淡入
+    document.body.classList.add('is-intro');
+    char.style.transition = 'none';
+    char.style.transform = 'translate(' + sx + 'px,' + sy + 'px) scale(' + sc + ')';
+    char.style.opacity = '1';
+
+    var bw = Math.min(W - 56, 260);
+    bubble.style.width = bw + 'px';
+    bubble.style.left = ((W - bw) / 2) + 'px';
+    bubble.style.top = (sy + 258 * sc + 18) + 'px';
+    bubble.style.opacity = '0';
+    setTimeout(function () { bubble.style.opacity = '1'; }, 200);
+
+    setTimeout(function () {
+      bubble.style.opacity = '0';
+      char.style.transition = 'transform .95s cubic-bezier(.16, 1, .3, 1)';
+      char.style.transform = 'translate(' + t.left + 'px,' + t.top + 'px) scale(' + (t.width / 240) + ')';
+      setTimeout(function () {
+        intro.style.opacity = '0';
+        setTimeout(function () { intro.hidden = true; }, 280);
+        char.style.display = 'none';
+        document.body.classList.remove('is-intro');
+        placePet();
+        pet.classList.remove('is-hidden');
+        resetIdle();
+      }, 980);
+    }, 2000);
+  }
+
+function runIntro() {
+    var intro = $('#intro');
+    var char = $('#introChar');
+    var bubble = $('#introBubble');
+    var art = document.querySelector('.cover__art');
+    var mon = document.querySelector('.sc-monitor');
+
+    if (!intro || !bubble || !art || !mon || !pet) return;
+    if (currentPageId() !== 'cover') return;
+    if (/[?&]nointro/.test(location.search)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    if (window.innerWidth < 900) return runIntroSmall(intro, char, bubble);
+
+    var a = art.getBoundingClientRect();
+    var m = mon.getBoundingClientRect();
+    var t = petBtn2.getBoundingClientRect();
+    if (!a.width || !m.width || !t.width) return;
+
+    // 只借 #intro 来放气泡，那台备用的角色永远不出现
+    if (char) char.style.display = 'none';
+    intro.hidden = false;
+    document.body.classList.add('is-intro');
+
+    // 气泡摆在插画正下方
+    var bw = Math.min(320, window.innerWidth - 32);
+    bubble.style.width = bw + 'px';
+    bubble.style.left = Math.min(Math.max(16, a.left + (a.width - bw) / 2), window.innerWidth - bw - 16) + 'px';
+    bubble.style.top = (a.bottom + 18) + 'px';
+    bubble.style.opacity = '0';
+    setTimeout(function () { bubble.style.opacity = '1'; }, 200);
+
+    // 停两秒，然后让封面上这台电脑自己飞进右下角。
+    // 全程只有它一只，不存在"藏一只、冒一只"。
+    setTimeout(function () {
+      bubble.style.opacity = '0';
+
+      var scale = t.width / m.width;
+      // translate 是相对元素自身算的，必须减掉插画自己的位置，否则会飞出屏幕
+      var dx = (t.left - a.left) - scale * (m.left - a.left);
+      var dy = (t.top - a.top) - scale * (m.top - a.top);
+      art.style.transformOrigin = 'top left';
+      art.style.transition = 'transform .95s cubic-bezier(.16, 1, .3, 1)';
+      art.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')';
+
+      setTimeout(function () {
+        // 落定：换成桌宠，再把插画放回去——这时才是"第二台电脑"出现
+        art.style.transition = 'none';
+        art.style.transform = '';
+        art.style.opacity = '0';
+        intro.hidden = true;
+        document.body.classList.remove('is-intro');
+        placePet();   // 此时布局已稳，重算一次，别让它停在左上角
+        pet.classList.remove('is-hidden');
+        resetIdle();
+
+        setTimeout(function () {
+          art.style.transition = 'opacity .35s ease-out';
+          art.style.opacity = '';
+        }, 80);
+      }, 980);
+    }, 2000);
+  }
+
+  if (pet) {
+    placePet();
+    resetIdle();
+    scheduleRoam();
+  }
+
+  // ---------------------------------------------------------------
+  // 开张
+  // ---------------------------------------------------------------
+
+  renderBits();
+  renderCat();
+  refresh();
+
+  var start = (location.hash || '').replace('#', '');
+  if (!start || !document.getElementById(start) || !canEnter(start)) start = 'cover';
+  go(start, true);
+
+  // 等封面入场动画落定再开口，否则量到的位置是斜的
+  // 开场要播的话，先把角落那只藏起来，否则会先闪一下小的、再弹出大的
+  var introOn = currentPageId() === 'cover'
+    && !/[?&]nointro/.test(location.search)
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (introOn && pet) pet.classList.add('is-hidden');
+  else if (pet) pet.classList.remove('is-hidden');
+  // 不播开场就把禁用撤掉，否则按钮会一直点不动
+  if (!introOn) document.body.classList.remove('is-intro');
+  if (!introOn) { document.body.classList.remove('is-intro'); var ie = document.getElementById('intro'); if (ie) ie.hidden = true; }
+  setTimeout(runIntro, 900);
+})();
+
+</script>
+</body>
+</html>
